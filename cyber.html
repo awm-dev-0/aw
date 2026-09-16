@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER LAB — خارطة طريق الأمن السيبراني</title>
+<style>
+  :root{
+    --bg:#0A0C10;
+    --bg-2:#0D1016;
+    --panel:#12151C;
+    --panel-2:#171B24;
+    --border:#242833;
+    --border-soft:#1B1F29;
+    --text:#E7E9ED;
+    --text-dim:#8A93A3;
+    --text-faint:#5B6472;
+    --gold:#F2B441;
+    --gold-dim:#8C6A26;
+    --mono: ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace;
+    --sans: "Segoe UI", Tahoma, "Geeza Pro", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 85% -10%, rgba(242,180,65,0.06), transparent),
+      radial-gradient(900px 400px at -10% 20%, rgba(61,139,253,0.05), transparent),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.55;
+    min-height:100vh;
+  }
+  a{color:inherit;}
+  ::selection{background:rgba(242,180,65,0.25);}
+
+  .topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,12,16,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    padding:14px 20px;
+    display:flex; align-items:center; gap:18px;
+    flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; flex:1; min-width:220px; }
+  .brand .mark{
+    width:38px;height:38px;border:1px solid var(--gold-dim);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold); font-family:var(--mono); font-size:13px; letter-spacing:1px;
+    flex-shrink:0;
+    background:linear-gradient(160deg, rgba(242,180,65,0.10), transparent);
+  }
+  .brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.2px;}
+  .brand .sub{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);letter-spacing:1.5px;text-transform:uppercase;}
+
+  .clearance{ display:flex;align-items:center;gap:12px; padding:6px 14px 6px 6px; border:1px solid var(--border); background:var(--panel); }
+  .gauge{width:46px;height:46px;flex-shrink:0;}
+  .gauge circle{fill:none;stroke-width:4;}
+  .gauge .track{stroke:var(--border-soft);}
+  .gauge .fill{stroke:var(--gold);stroke-linecap:round;transition:stroke-dasharray .5s ease;}
+  .gauge text{fill:var(--text);font-family:var(--mono);font-size:9px;font-weight:700;}
+  .clearance-info{font-family:var(--mono);}
+  .clearance-info .rank{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.3px;}
+  .clearance-info .pct{font-size:10px;color:var(--text-faint);}
+
+  .reset-btn{
+    font-family:var(--mono); font-size:11px; letter-spacing:.5px;
+    background:transparent; color:var(--text-dim);
+    border:1px solid var(--border); padding:9px 14px; cursor:pointer;
+    transition:.15s;
+  }
+  .reset-btn:hover{border-color:#7a4141;color:#e08585;}
+  .reset-btn:disabled{opacity:.5;cursor:wait;}
+
+  .shell{display:flex; align-items:flex-start; max-width:1280px; margin:0 auto;}
+  .sidebar{
+    position:sticky; top:73px;
+    width:250px; flex-shrink:0;
+    max-height:calc(100vh - 73px);
+    overflow-y:auto;
+    padding:22px 14px 40px 18px;
+    border-left:1px solid var(--border-soft);
+  }
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+  .navlabel{font-family:var(--mono);font-size:10px;color:var(--text-faint);letter-spacing:2px;padding:0 8px 8px;text-transform:uppercase;}
+  .navitem{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 8px; cursor:pointer; border-right:2px solid transparent;
+    color:var(--text-dim); font-size:13px; transition:.15s;
+  }
+  .navitem:hover{color:var(--text); background:var(--panel-2);}
+  .navitem.active{color:var(--text); border-color:var(--phase-color, var(--gold)); background:var(--panel-2);}
+  .navitem .dot{width:8px;height:8px;border-radius:50%;background:var(--phase-color,var(--text-faint));flex-shrink:0;}
+  .navitem .num{font-family:var(--mono);font-size:10px;color:var(--text-faint);width:20px;text-align:center;flex-shrink:0;}
+  .navitem .bar{margin-inline-start:auto;width:28px;height:3px;background:var(--border-soft);position:relative;overflow:hidden;flex-shrink:0;}
+  .navitem .bar i{position:absolute;inset:0;width:0%;background:var(--phase-color,var(--gold));}
+
+  .main{flex:1; min-width:0; padding:26px 26px 100px;}
+
+  .hero{ padding:26px 4px 34px; border-bottom:1px solid var(--border-soft); margin-bottom:30px; }
+  .hero .eyebrow{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
+  .hero h2{font-size:26px;margin:0 0 10px;font-weight:800;}
+  .hero p{color:var(--text-dim);max-width:640px;font-size:14px;margin:0 0 18px;}
+  .hero-progress{ display:flex; align-items:center; gap:14px; font-family:var(--mono); font-size:11px; color:var(--text-faint); max-width:520px; }
+  .hero-progress .track{flex:1;height:6px;background:var(--panel-2);border:1px solid var(--border-soft);position:relative;}
+  .hero-progress .track i{position:absolute;inset:0;width:0%;background:linear-gradient(90deg,#8C6A26,var(--gold));}
+  .hero-legal{
+    margin-top:16px; padding:12px 14px; border:1px solid #5c3b23; background:rgba(232,114,44,0.06);
+    font-size:12.5px; color:#e0a37a; max-width:640px;
+  }
+
+  .phase{
+    scroll-margin-top:90px; margin-bottom:40px; padding:22px 24px;
+    background:var(--panel); border:1px solid var(--border-soft);
+    border-top:2px solid var(--phase-color, var(--gold)); position:relative;
+  }
+  .phase-head{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
+  .phase-emoji{font-size:22px;}
+  .phase-num{ font-family:var(--mono); font-size:11px; color:var(--phase-color,var(--gold)); border:1px solid var(--phase-color,var(--gold)); padding:2px 8px; letter-spacing:1px; }
+  .phase-head h3{font-size:18px;margin:0;font-weight:700;}
+  .phase-head .en{font-family:var(--mono);font-size:11px;color:var(--text-faint);}
+  .phase-progress{ margin-inline-start:auto; display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px; color:var(--text-faint); min-width:120px; }
+  .phase-progress .track{width:80px;height:5px;background:var(--panel-2);border:1px solid var(--border-soft);position:relative;}
+  .phase-progress .track i{position:absolute;inset:0;width:0%;background:var(--phase-color,var(--gold));}
+
+  .flow{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; font-family:var(--mono);font-size:11.5px;color:var(--text-dim); margin:14px 0 4px; padding:12px 14px; background:var(--bg-2); border:1px solid var(--border-soft); }
+  .flow span.node{padding:3px 9px;border:1px solid var(--border);color:var(--text);}
+  .flow span.arrow{color:var(--phase-color,var(--gold));}
+
+  .section-block{margin-top:18px;}
+  .section-block h4{ font-size:12px; color:var(--text-dim); margin:0 0 10px; font-weight:700; letter-spacing:.4px; display:flex;align-items:center;gap:8px; }
+  .section-block h4::before{content:"";width:10px;height:1px;background:var(--phase-color,var(--gold));}
+  .section-block p.lead{color:var(--text-dim);font-size:13px;margin:0 0 12px;max-width:680px;}
+
+  .checklist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;}
+  .checklist.single{grid-template-columns:1fr;}
+  @media (max-width:640px){.checklist{grid-template-columns:1fr;}}
+  .checklist li{border-bottom:1px dashed var(--border-soft);}
+  .citem{ display:flex; align-items:flex-start; gap:10px; padding:8px 2px; cursor:pointer; font-size:13.5px; color:var(--text-dim); transition:.12s; }
+  .citem:hover{color:var(--text);}
+  .citem input{ appearance:none; -webkit-appearance:none; width:16px;height:16px;flex-shrink:0;margin-top:2px; border:1px solid var(--text-faint); background:transparent; cursor:pointer; position:relative; transition:.12s; }
+  .citem input:checked{background:var(--phase-color,var(--gold));border-color:var(--phase-color,var(--gold));}
+  .citem input:checked::after{ content:"✓"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#0A0C10; font-weight:900; }
+  .citem span.txt{flex:1;}
+  .citem.done span.txt{color:var(--text-faint); text-decoration:line-through; text-decoration-color:var(--border);}
+  .citem:focus-within{outline:1px solid var(--phase-color,var(--gold)); outline-offset:2px;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .chip{ font-family:var(--mono); font-size:11px; color:var(--text-dim); border:1px solid var(--border); padding:4px 10px; background:var(--bg-2); }
+
+  .callout{ margin-top:16px; padding:13px 15px; border:1px solid var(--border); background:var(--bg-2); display:flex; gap:12px; align-items:flex-start; }
+  .callout .badge{ font-family:var(--mono); font-size:10px; letter-spacing:1px; padding:3px 8px; color:#0A0C10; background:var(--phase-color,var(--gold)); flex-shrink:0; font-weight:700; white-space:nowrap; }
+  .callout .body{flex:1; font-size:13px; color:var(--text-dim);}
+  .callout.task-item{cursor:pointer;}
+  .callout.task-item.done .body{color:var(--text-faint);text-decoration:line-through;text-decoration-color:var(--border);}
+  .callout.warn{border-color:#5c3b23;}
+  .callout.warn .badge{background:#E8722C;}
+  .callout.note{border-style:dashed;}
+
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:6px;}
+  .tool-card{border:1px solid var(--border);background:var(--bg-2);padding:13px;}
+  .tool-card h5{margin:0 0 4px;font-size:13px;}
+  .tool-card .cat{font-family:var(--mono);font-size:10px;color:var(--phase-color,var(--gold));margin-bottom:6px;}
+  .tool-card p{margin:0;font-size:12px;color:var(--text-dim);}
+  .tool-card code{display:block;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text);background:var(--panel-2);padding:6px 8px;border:1px solid var(--border-soft);}
+
+  .tracks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:14px;}
+  .track-card{ border:1px solid var(--border); padding:14px; cursor:pointer; background:var(--bg-2); transition:.15s; }
+  .track-card:hover{border-color:var(--text-faint);}
+  .track-card.selected{border-color:var(--gold); background:rgba(242,180,65,0.06);}
+  .track-card .tc-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:700;font-size:13.5px;}
+  .track-card .tc-path{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);}
+
+  .tool-simulator{margin-top:10px;border:1px solid var(--border-soft);background:var(--bg-2);padding:14px;}
+  .tool-simulator label{display:block;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);margin-bottom:6px;letter-spacing:.5px;}
+  .tool-simulator input[type=text]{width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12.5px;padding:8px 10px;}
+  .tool-simulator .out{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--gold);white-space:pre-wrap;min-height:18px;}
+
+  /* ---- tool chips that link to a detail page ---- */
+  .chip-link{cursor:pointer;background:var(--panel-2);border-color:var(--phase-color,var(--border));color:var(--text);transition:.12s;}
+  .chip-link:hover{background:rgba(242,180,65,0.10);}
+  .chip-link::after{content:" ↗";opacity:.6;font-size:10px;}
+  .chip-soon{opacity:.45;cursor:default;}
+
+  /* ---- tool detail page ---- */
+  .tool-detail{max-width:900px;}
+  .td-back{
+    font-family:var(--mono); font-size:11.5px; color:var(--text-dim);
+    background:transparent; border:1px solid var(--border); padding:8px 14px;
+    cursor:pointer; margin-bottom:22px; transition:.12s;
+  }
+  .td-back:hover{color:var(--text);border-color:var(--text-faint);}
+  .td-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px;}
+  .td-head h2{font-size:24px;margin:0;font-weight:800;}
+  .td-cat{font-family:var(--mono);font-size:10.5px;color:var(--phase-color,var(--gold));border:1px solid var(--phase-color,var(--gold));padding:3px 9px;letter-spacing:.8px;}
+  .td-summary{color:var(--text-dim);font-size:14px;max-width:720px;margin:10px 0 6px;}
+  .td-overview{color:var(--text-dim);font-size:13.5px;line-height:1.8;margin:14px 0 30px;max-width:720px;}
+  .td-overview p{margin:0 0 12px;}
+  .td-overview strong{color:var(--text);}
+
+  .td-cmd{border:1px solid var(--border-soft);background:var(--panel);border-top:2px solid var(--phase-color,var(--gold));padding:20px 22px;margin-bottom:24px;}
+  .td-cmd h3{font-size:15px;margin:0 0 12px;font-weight:700;display:flex;align-items:center;gap:10px;}
+  .td-cmd h3 .shelltag{font-family:var(--mono);font-size:9.5px;color:var(--text-faint);border:1px solid var(--border);padding:2px 7px;text-transform:uppercase;letter-spacing:1px;}
+
+  .td-syntax{position:relative;font-family:var(--mono);font-size:12.5px;color:var(--gold);background:var(--bg-2);border:1px solid var(--border-soft);padding:12px 44px 12px 14px;margin-bottom:12px;direction:ltr;text-align:left;overflow-x:auto;}
+  .td-copy{position:absolute;top:8px;left:8px;background:var(--panel-2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:9.5px;padding:4px 8px;cursor:pointer;}
+  .td-copy:hover{color:var(--text);}
+  .td-copy.copied{color:var(--gold);border-color:var(--gold-dim);}
+
+  .td-desc{color:var(--text-dim);font-size:13px;line-height:1.75;margin:0 0 14px;}
+
+  .td-flags{width:100%;border-collapse:collapse;margin:0 0 14px;font-size:12.5px;}
+  .td-flags th{font-family:var(--mono);font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.6px;text-align:right;padding:6px 8px;border-bottom:1px solid var(--border);}
+  .td-flags td{padding:8px;border-bottom:1px solid var(--border-soft);color:var(--text-dim);vertical-align:top;}
+  .td-flags td:first-child{font-family:var(--mono);color:var(--text);white-space:nowrap;direction:ltr;text-align:left;}
+
+  .td-examples{margin:0 0 14px;}
+  .td-example{margin-bottom:10px;}
+  .td-example code{display:block;font-family:var(--mono);font-size:12px;color:var(--text);background:var(--bg-2);border:1px solid var(--border-soft);padding:8px 10px;direction:ltr;text-align:left;overflow-x:auto;margin-bottom:5px;}
+  .td-example .explain{font-size:12.5px;color:var(--text-dim);}
+
+  .td-sub{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px;}
+  .td-output{font-family:var(--mono);font-size:11.5px;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--border-soft);padding:12px 14px;white-space:pre-wrap;direction:ltr;text-align:left;margin-bottom:6px;overflow-x:auto;}
+
+  .td-lab{border-top:1px solid var(--border-soft);padding-top:20px;margin-top:26px;}
+  .td-notfound{color:var(--text-dim);font-size:13.5px;}
+
+  footer{ text-align:center; padding:30px 20px 60px; font-family:var(--mono); font-size:11px; color:var(--text-faint); }
+  .save-status{font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-inline-start:6px;}
+
+  .navlabel{margin-top:16px;}
+  .navlabel:first-child{margin-top:0;}
+
+  .mobile-nav{
+    display:none;
+    width:100%; box-sizing:border-box;
+    margin:0; padding:11px 14px;
+    background:var(--panel); color:var(--text);
+    border:none; border-bottom:1px solid var(--border);
+    font-family:var(--sans); font-size:13.5px;
+  }
+  .mobile-nav:focus{outline:1px solid var(--gold); outline-offset:-1px;}
+
+  @media (max-width:900px){ .sidebar{display:none;} .main{padding:20px 16px 80px;} .mobile-nav{display:block; position:sticky; top:0; z-index:40;} }
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">CL</div>
+    <div>
+      <h1>CYBER LAB</h1>
+      <div class="sub">Complete Cybersecurity Roadmap</div>
+    </div>
+  </div>
+  <div class="clearance">
+    <svg class="gauge" viewBox="0 0 46 46">
+      <circle class="track" cx="23" cy="23" r="19"/>
+      <circle id="gaugeFill" class="fill" cx="23" cy="23" r="19" stroke-dasharray="0 1000" transform="rotate(-90 23 23)"/>
+      <text id="gaugePct" x="23" y="27" text-anchor="middle">0%</text>
+    </svg>
+    <div class="clearance-info">
+      <div class="rank" id="rankLabel">مجنَّد</div>
+      <div class="pct" id="rankSub">جاري التحميل…</div>
+    </div>
+  </div>
+  <button class="reset-btn" id="resetBtn">↺ إعادة تعيين التقدم</button>
+  <span class="save-status" id="saveStatus"></span>
+</div>
+
+<select class="mobile-nav" id="mobileNav"></select>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main">
+    <div class="hero">
+      <div class="eyebrow">Task-Based Roadmap</div>
+      <h2>من الصفر إلى التخصص في الأمن السيبراني</h2>
+      <p>منهج كامل مبني على مهام حقيقية وليس مجرد قائمة عناوين: من تجهيز المختبر، مرورًا بالشبكات ولينكس والبرمجة وأمن الويب، وصولًا إلى تصعيد الصلاحيات والـ Active Directory واختيار مسار التخصص. علّم كل عنصر أنجزته وسيُحفظ تقدمك تلقائيًا.</p>
+      <div class="hero-progress">
+        <span id="heroCount">0 / 0</span>
+        <div class="track"><i id="heroBar"></i></div>
+        <span>مكتمل</span>
+      </div>
+      
+    </div>
+    <div id="phasesRoot"></div>
+    <section id="toolDetailView" class="tool-detail" hidden></section>
+  </main>
+</div>
+
+<footer>يُحفظ تقدمك تلقائيًا في هذا المتصفح على هذا الجهاز فقط — لن يظهر لأي شخص آخر، وامسح بيانات المتصفح بحذر حتى لا تفقده.</footer>
+
+<script>
+/* ---------------- data ---------------- */
+const PHASES = [
+{ id:'p0', num:'00', emoji:'🧪', color:'#7A8699', title:'تجهيز البيئة', en:'Lab Setup',
+  sections:[{h:null, items:[
+    'ثبّت VirtualBox أو VMware','أنشئ VM لـ Kali Linux','أنشئ VM لـ Ubuntu','أنشئ Windows VM للتدريب',
+    'افهم NAT / Host-Only / Internal Network','تعلّم أخذ Snapshot واستعادته','اجعل المختبر معزولًا عن أجهزتك الحقيقية',
+    'ثبّت Docker لتشغيل تطبيقات ضعيفة (Juice Shop / DVWA)'
+  ]}] },
+
+{ id:'p1', num:'01', emoji:'🟢', color:'#3FB871', title:'Computer Fundamentals', en:'أساسيات الحاسوب',
+  sections:[
+    {h:'Hardware', items:['CPU / RAM / Storage','BIOS/UEFI','Boot process','Processes vs Threads','Kernel vs User Space','Filesystem','Memory basics','Virtualization']},
+    {h:'Operating Systems', items:['كيف يعمل OS','Users','Permissions','Processes','Services','Environment Variables','Drivers','Logs']}
+  ],
+  task:{label:'مهمة', text:'اشرح لنفسك بالتفصيل ماذا يحدث منذ الضغط على زر التشغيل حتى ظهور سطح المكتب (POST → Bootloader → Kernel → Init → Login).'} },
+
+{ id:'p2', num:'02', emoji:'🔵', color:'#3D8BFD', title:'Networking', en:'الشبكات — أهم مرحلة',
+  sections:[
+    {h:'الأساسيات', items:['OSI Model','TCP/IP Model','MAC','ARP','IPv4','IPv6 basics','Subnetting','CIDR','Routing','Switching','VLAN','NAT']},
+    {h:'البروتوكولات', items:['TCP','UDP','Ports','DNS','DHCP','HTTP','HTTPS','TLS','ICMP','FTP','SSH','SMTP','SMB','LDAP']},
+    {h:'الأمن', items:['Firewalls','VPN','Proxy','IDS','IPS']}
+  ],
+  tools:['ping','ip','traceroute','nslookup','dig','curl','ss','Wireshark','tcpdump'],
+  interactive:'subnet',
+  task:{label:'مشروع', text:'استخدم Wireshark داخل شبكتك التجريبية وتتبّع DNS query، ثم TCP 3-way handshake، ثم طلب HTTP/HTTPS كامل.'} },
+
+{ id:'p3', num:'03', emoji:'🐧', color:'#E0B84C', title:'Linux', en:'لينكس',
+  sections:[
+    {h:'النظام', items:['Filesystem hierarchy','/etc, /var, /home, /proc, /dev','Users & Groups','Permissions & Ownership','Processes','Services & systemd','SSH','Logs & journalctl','Package managers']},
+    {h:'Bash', items:['Variables','Conditions','Loops','Functions','Pipes','Redirection','Exit codes','grep / sed / awk','find / xargs']}
+  ],
+  tools:['ls','chmod','chown','ps','top','kill','systemctl','journalctl','grep','sed','awk','find','curl','ssh','tar'],
+  task:{label:'مشروع', text:'اكتب Bash script يجمع معلومات النظام والشبكة (users, processes, open ports) ويكتبها في ملف تقرير.'} },
+
+{ id:'p4', num:'04', emoji:'🪟', color:'#3AAEDC', title:'Windows Security', en:'ويندوز',
+  sections:[{h:null, items:[
+    'Windows architecture','Users / Groups / ACL','NTFS permissions','Processes & Services','Registry',
+    'Event Viewer & Sysmon','PowerShell أساسيات','CMD','Windows Firewall','Windows Defender',
+    'Task Scheduler','Windows authentication (Kerberos/NTLM)'
+  ]}],
+  task:{label:'مهمة', text:'أنشئ مستخدمين مختلفين داخل Windows VM، وجرّب صلاحيات NTFS المختلفة بينهم، وراقب الأحداث في Event Viewer.'} },
+
+{ id:'p5', num:'05', emoji:'🐍', color:'#2FB8A6', title:'Programming for Security', en:'Python ثم C',
+  sections:[
+    {h:'Python', items:['Variables & Functions','Files & JSON','HTTP Requests','Sockets','Regex','subprocess','Automation scripts']},
+    {h:'C (بعد Python)', items:['Pointers','Memory: Stack/Heap','Structs','Compilation','Segmentation faults']},
+    {h:'مشاريع', items:['Port checker للـ lab الخاص بك','Log analyzer','HTTP client بسيط','TCP client/server بسيط']}
+  ] },
+
+{ id:'p6', num:'06', emoji:'🔐', color:'#C9986B', title:'Cryptography', en:'التشفير',
+  sections:[{h:null, items:[
+    'الفرق بين Encoding / Encryption / Hashing','Symmetric encryption (AES)','Asymmetric encryption (RSA/ECC)',
+    'Diffie-Hellman','Hashing (SHA family) و لماذا MD5 ضعيف','Password hashing: bcrypt / Argon2','HMAC',
+    'Digital signatures','Certificates & PKI','TLS handshake'
+  ]}],
+  task:{label:'تمرين', text:'قارن ناتج SHA-256 لنفس النص مرتين، ثم أضف salt وشاهد كيف يتغيّر hash كلمة المرور.'} },
+
+{ id:'p7', num:'07', emoji:'🌐', color:'#9575E8', title:'Web Security', en:'أمن الويب',
+  flow:['Browser','HTTP Request','Web Server','Application','Database'],
+  sections:[
+    {h:'الأساسيات', items:['HTTP methods & Headers','Cookies & Sessions','JWT','CORS','CSP','Same-Origin Policy','Authentication vs Authorization','APIs / REST']},
+    {h:'OWASP Top 10', items:['SQL Injection','XSS','CSRF','SSRF','IDOR / Broken Access Control','File Upload vulnerabilities','Path Traversal','Command Injection','XXE','SSTI','Security Misconfiguration','Open Redirect']}
+  ],
+  tools:['Burp Suite','OWASP ZAP','Browser DevTools','curl'],
+  interactive:'jwt',
+  warn:'طبّق كل شيء على Labs مثل PortSwigger Web Security Academy وDVWA وJuice Shop، وليس مواقع حقيقية بدون تصريح.' },
+
+{ id:'p8', num:'08', emoji:'🔎', color:'#6FCF97', title:'Reconnaissance & OSINT', en:'الاستطلاع',
+  sections:[{h:null, items:[
+    'Passive vs Active reconnaissance','OSINT concepts','DNS enumeration','WHOIS','Subdomain discovery','Technology fingerprinting','Metadata analysis'
+  ]}],
+  tools:['Amass','Subfinder','theHarvester','WhatWeb','dig'],
+  note:'الاستطلاع على نطاقات لا تملكها بدون تصريح كتابي يُعد غير قانوني في معظم الدول.' },
+
+{ id:'p9', num:'09', emoji:'⚔️', color:'#E8722C', title:'Offensive Security', en:'الاختراق الهجومي',
+  sections:[{h:null, items:[
+    'Enumeration','Vulnerability assessment','Exploitation concepts','Sessions & Shells',
+    'Privilege escalation','Lateral movement concepts','Post-exploitation concepts','كتابة تقرير Pentest'
+  ]}],
+  tools:['Nmap','Burp Suite','Metasploit','Netcat','Gobuster / ffuf','Nikto'],
+  task:{label:'مختبر', text:'Kali → Metasploitable / OWASP Juice Shop → تحليل الثغرة → إثباتها → كتابة التقرير → اقتراح الإصلاح.'} },
+
+{ id:'p10', num:'10', emoji:'🟣', color:'#A855F7', title:'Privilege Escalation', en:'تصعيد الصلاحيات',
+  sections:[
+    {h:'Linux', items:['SUID/SGID','sudo misconfigurations','Linux capabilities','Cron jobs','Writable PATH','Kernel exploits concepts']},
+    {h:'Windows', items:['Service permissions','Unquoted service paths','Scheduled Tasks','Token privileges','Registry misconfigurations','DLL search order']}
+  ],
+  tools:['LinPEAS','WinPEAS','pspy','PowerUp'],
+  note:'كل التطبيقات داخل بيئة تدريبية معزولة فقط.' },
+
+{ id:'p11', num:'11', emoji:'🔑', color:'#D6469B', title:'Password Security', en:'أمن كلمات المرور',
+  sections:[{h:null, items:[
+    'Password storage & Salting','Password policies & MFA','Brute force concepts','Dictionary attacks',
+    'Password spraying','Credential stuffing'
+  ]}],
+  tools:['Hashcat','John the Ripper'],
+  interactive:'entropy',
+  note:'استخدم hashes تجريبية خاصة بك فقط لفهم آلية عمل الأدوات.' },
+
+{ id:'p12', num:'12', emoji:'🧬', color:'#E63946', title:'Reverse Engineering & Malware', en:'الهندسة العكسية',
+  sections:[
+    {h:'Reverse Engineering', items:['Assembly basics','Registers','Stack & Heap','Calling conventions','Debugging']},
+    {h:'Malware Analysis (دفاعي)', items:['أنواع Malware','Static analysis: strings/PE/ELF','Dynamic analysis: processes/network','العمل داخل Sandbox/VM فقط']}
+  ],
+  tools:['GDB','Ghidra','x64dbg','strings','objdump','Procmon'] },
+
+{ id:'p13', num:'13', emoji:'🏢', color:'#5B7083', title:'Active Directory', en:'خدمة الدليل النشط',
+  sections:[
+    {h:'المفاهيم', items:['Domain / Forest / Tree / OU','Kerberos','LDAP','NTLM','Group Policy','SPNs & Delegation']},
+    {h:'داخل الـ Lab', items:['Enumeration','Misconfigurations','Privilege boundaries','Detection & Hardening']}
+  ],
+  tools:['BloodHound','Impacket','NetExec'] },
+
+{ id:'p14', num:'14', emoji:'🛡️', color:'#2D7DD2', title:'Blue Team & Detection', en:'الفريق الأزرق',
+  sections:[{h:null, items:[
+    'Log analysis','SIEM concepts','IDS/IPS','EDR concepts','Incident Response process','Threat Hunting','Digital Forensics basics'
+  ]}],
+  tools:['Splunk','Wazuh','Wireshark','Sysmon'] },
+
+{ id:'p15', num:'15', emoji:'☁️', color:'#4FC3F7', title:'Cloud Security', en:'أمن السحابة',
+  sections:[
+    {h:'AWS', items:['IAM','S3','EC2','VPC & Security Groups','CloudTrail','Least privilege']},
+    {h:'Azure', items:['Azure basics','Microsoft Entra ID']}
+  ] },
+];
+
+const TRACKS = [
+  {id:'pentest', emoji:'🔴', title:'Pentesting', path:'Web → Network → AD → Exploitation'},
+  {id:'blue', emoji:'🔵', title:'Blue Team', path:'SOC → SIEM → Detection → Incident Response'},
+  {id:'red', emoji:'🟣', title:'Red Team', path:'AD → OPSEC → C2 concepts → Advanced tradecraft'},
+  {id:'appsec', emoji:'🟢', title:'AppSec', path:'Programming → Web → Code Review → Secure SDLC'},
+  {id:'malware', emoji:'🟠', title:'Malware Analysis', path:'Windows → Assembly → Reverse Engineering → Malware'},
+  {id:'cloud', emoji:'⚫', title:'Cloud Security', path:'AWS/Azure → IAM → Containers → Kubernetes'},
+];
+
+const TOOLS_DB = [
+  {name:'Nmap', cat:'Scanning', desc:'ماسح منافذ وشبكات، يكتشف الأجهزة والخدمات والإصدارات المفتوحة.', ex:'nmap -sV -p- 192.168.56.101'},
+  {name:'Wireshark', cat:'Network', desc:'محلل حزم مرئي لفحص كل ما يمر على الشبكة بالتفصيل.', ex:'ابدأ Capture على واجهة الشبكة، فلتر: http'},
+  {name:'Burp Suite', cat:'Web', desc:'Proxy لاعتراض وتعديل طلبات HTTP لاختبار تطبيقات الويب.', ex:'اعترض الطلب → Repeater → عدّل Parameter'},
+  {name:'Hashcat', cat:'Password Auditing', desc:'أداة استرجاع كلمات مرور من hashes بسرعة عالية باستخدام GPU.', ex:'hashcat -m 0 -a 0 hash.txt rockyou.txt'},
+  {name:'LinPEAS', cat:'Privilege Escalation', desc:'سكربت يفحص نظام Linux تلقائيًا بحثًا عن مسارات تصعيد صلاحيات.', ex:'./linpeas.sh | tee out.txt'},
+  {name:'BloodHound', cat:'Active Directory', desc:'يرسم خريطة علاقات وصلاحيات AD لاكتشاف مسارات الهجوم المحتملة.', ex:'شغّل SharpHound لجمع البيانات ثم حلّلها في BloodHound'},
+];
+
+const GLOSSARY = [
+  'CIA Triad — Confidentiality, Integrity, Availability','AAA — Authentication, Authorization, Accounting',
+  'CVE — Common Vulnerabilities and Exposures','CVSS — نظام تقييم شدة الثغرات','MITRE ATT&CK — إطار عمل لتصنيف تكتيكات المهاجمين',
+  'SIEM — نظام لتجميع وتحليل السجلات الأمنية','IDS/IPS — أنظمة كشف/منع الاختراق','WAF — جدار حماية تطبيقات الويب',
+  'Zero Trust — مبدأ عدم الثقة الافتراضية بأي طرف','PKI — البنية التحتية للمفاتيح العامة','JWT — JSON Web Token لنقل بيانات موثوقة',
+  'IOC — مؤشر اختراق (Indicator of Compromise)','TTP — أساليب وتقنيات وإجراءات المهاجم'
+];
+
+const CERTS = [
+  'Security+ (مبتدئ)','Google Cybersecurity Certificate (مبتدئ)','eJPT (متوسط)','PNPT (متوسط)',
+  'BTL1 (Blue Team - متوسط)','OSCP (متقدم)','OSWE (متقدم)','CRTO (متقدم)','CySA+ (Blue Team)'
+];
+
+const CAREERS = [
+  'SOC Analyst','Security Engineer','Penetration Tester','Red Teamer','Blue Teamer',
+  'Cloud Security Engineer','Application Security Engineer','Malware Analyst','Digital Forensics','Threat Hunter'
+];
+
+const FINAL_PROJECTS = [
+  'بناء Home Cyber Lab كامل','تحليل شبكة بـ Wireshark','كتابة Network Scanner تعليمي','تحليل Web App ضعيف بالكامل',
+  'حل 20+ Web Security Labs','حل Linux PrivEsc Labs','حل Windows PrivEsc Labs','بناء Active Directory Lab',
+  'تحليل Malware تدريبي آمن داخل Sandbox','كتابة Pentest Report كامل','بناء Mini SIEM Lab','التحقيق في Incident وهمي (Blue Team)'
+];
+
+const QUICKPATH = [
+  'Networking Fundamentals','Linux Fundamentals','Bash','Windows Fundamentals','Python',
+  'HTTP + Web Basics','Security Fundamentals','Nmap + Wireshark + Burp','Web Security Labs','Linux / Windows PrivEsc'
+];
+
+/* ---------------- tool detail pages ----------------
+   Deep per-tool reference pages (syntax, flags, real examples, output
+   explained, when/why, lab exercise). Populated phase-by-phase — this
+   batch covers the Networking phase tools. More phases are added the
+   same way: add a key here, and any chip whose slugified name matches
+   a key automatically becomes a clickable link to this page. */
+const TOOL_DETAIL = {
+
+ping: {
+  name:'ping', category:'Networking · تشخيص', color:'#3D8BFD',
+  summary:'أداة تشخيص أساسية ترسل رسائل ICMP Echo Request لجهاز هدف، وتقيس هل يستجيب وخلال كم من الوقت (RTT).',
+  overview:`<p><strong>ping</strong> هي أول أداة يتعلمها أي شخص في الشبكات، وأول أمر تكتبه فعليًا عند الشك في وجود مشكلة اتصال. تعمل بإرسال حزمة <strong>ICMP Echo Request</strong> إلى الجهاز الهدف، وانتظار حزمة <strong>ICMP Echo Reply</strong> كرد. الفرق الزمني بين الإرسال والاستقبال هو <strong>RTT (Round Trip Time)</strong> الذي تراه بالمللي ثانية.</p><p>موجودة في كل نظام تشغيل تقريبًا، لكن السلوك الافتراضي يختلف: على Linux تستمر بلا توقف حتى تضغط Ctrl+C، بينما على Windows ترسل 4 حزم فقط وتتوقف تلقائيًا.</p><p>من الناحية الأمنية، ping هي أول خطوة في أي عملية اكتشاف مضيفين (Host Discovery) — لكنها ليست دليلًا قاطعًا؛ كثير من الأنظمة والجدران النارية تحظر ICMP تمامًا، فعدم الرد لا يعني بالضرورة أن الجهاز مغلق أو غير موجود.</p>`,
+  commands:[
+    {
+      title:'فحص اتصال أساسي', shell:'bash / cmd',
+      syntax:'ping [OPTIONS] <host>',
+      desc:'الاستخدام الأبسط — يرسل طلبات ICMP متتالية للهدف ويطبع نتيجة كل حزمة سطرًا بسطر، ثم ملخصًا إحصائيًا في النهاية.',
+      flags:[
+        ['-c &lt;count&gt;','عدد الحزم المرسلة ثم التوقف تلقائيًا (على Windows الخيار المكافئ هو -n).'],
+        ['-i &lt;interval&gt;','الفاصل الزمني بالثواني بين كل حزمة والتي تليها (الافتراضي ثانية واحدة).'],
+        ['-s &lt;size&gt;','حجم بيانات الحزمة بالبايت — مفيد لاختبار الـ MTU والتجزئة (Fragmentation).'],
+        ['-W &lt;timeout&gt;','أقصى وقت انتظار للرد بالثواني قبل اعتبار الحزمة ضائعة.'],
+        ['-q','وضع صامت — يطبع فقط الملخص النهائي بدون سطر لكل حزمة.']
+      ],
+      examples:[
+        ['ping -c 4 8.8.8.8','إرسال 4 حزم فقط لخادم DNS من جوجل ثم التوقف — أشهر أمر لاختبار الاتصال بالإنترنت عمومًا وليس بموقع معين.'],
+        ['ping -c 4 example.com','نفس الفكرة باسم نطاق — يفحص أيضًا هل تحليل DNS يعمل قبل أن يصل حتى لمرحلة ICMP.'],
+        ['ping -i 0.2 -c 20 192.168.1.1','إرسال حزم أسرع (كل 0.2 ثانية) لقياس استقرار الاتصال بالراوتر المحلي تحت ضغط أعلى.']
+      ],
+      sample:`PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=115 time=14.2 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=115 time=13.8 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=115 time=14.9 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=115 time=13.6 ms
+
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 13.6/14.1/14.9/0.5 ms`,
+      outputExplain:'كل سطر حزمة ناجحة: icmp_seq رقم تسلسلي، ttl القيمة المتبقية من Time To Live (تنخفض واحدًا مع كل راوتر تمر به، وتساعد تقريبيًا على معرفة نظام التشغيل: Linux يبدأ عادة من 64، Windows من 128)، time هو RTT. الملخص الأخير: packet loss (نسبة الحزم الضائعة، أي رقم أعلى من صفر يستحق تحقيقًا)، وrtt min/avg/max/mdev (أقل، متوسط، أعلى، وانحراف معياري تقريبي للزمن — mdev مرتفع يعني اتصالًا غير مستقر رغم أن المتوسط قد يبدو جيدًا).',
+      when:'أول أمر تستخدمه عند تشخيص أي مشكلة شبكة: هل الجهاز يستجيب أصلًا؟ هل الاتصال بطيء (RTT مرتفع)؟ هل هناك فقد حزم؟ يُستخدم أيضًا في مرحلة الاستطلاع (Host Discovery) لمعرفة أي أجهزة على شبكة فرعية نشطة — لكن انتبه أن كثيرًا من الأنظمة الحديثة تُسقط ICMP كإجراء أمني، فعدم الرد ≠ الجهاز غير موجود.'
+    },
+    {
+      title:'اختبار حجم الحزمة والـ MTU', shell:'bash',
+      syntax:'ping -M do -s <size> <host>',
+      desc:'تشخيص متقدم لمعرفة أقصى حجم حزمة يمكن أن يمر عبر المسار دون تجزئة (Fragmentation) — أساسي عند تشخيص مشاكل VPN وTunnels.',
+      flags:[
+        ['-M do','منع تجزئة الحزمة (Don\'t Fragment) — إذا كانت الحزمة أكبر من الـ MTU المسموح على أي جزء من المسار، سيُرفض إرسالها بدل تجزئتها تلقائيًا.'],
+        ['-s &lt;size&gt;','حجم بيانات الحزمة بالبايت (لا يشمل هيدر IP/ICMP الذي يضيف 28 بايت إضافية عادة).']
+      ],
+      examples:[
+        ['ping -M do -s 1472 8.8.8.8','اختبار هل حزمة 1472 بايت بيانات (+28 بايت هيدر = 1500 القياسي لإيثرنت) تمر دون تجزئة.'],
+        ['ping -M do -s 1473 8.8.8.8','حزمة أكبر بواحد بايت — إذا ظهر خطأ فهذا يعني أن الـ MTU الفعلي على المسار أقل من 1500، وهو تشخيص شائع لمشاكل VPN غريبة (تصفح بطيء أو اتصالات HTTPS تنقطع فجأة).']
+      ],
+      sample:`PING 8.8.8.8 (8.8.8.8) 1472(1500) bytes of data.
+ping: local error: message too long, mtu=1500`,
+      outputExplain:'الخطأ "message too long, mtu=1500" يعني أن النظام رفض إرسال الحزمة محليًا لأنها تتجاوز MTU الواجهة نفسها (وليس بالضرورة مسارًا بعيدًا). لو المشكلة في منتصف المسار (مثل نفق VPN بـ MTU أصغر)، سترى بدلًا من ذلك ردًا من راوتر وسيط بعنوان "Frag needed and DF set".',
+      when:'يُستخدم عند تشخيص مشاكل VPN أو الأنفاق (Tunnels) حيث الـ MTU الفعّال أقل من 1500 القياسي، فتُقطع بعض الاتصالات — خصوصًا HTTPS — بشكل غريب ومتقطع رغم أن ping العادي يعمل بشكل طبيعي (لأن حزم ping الصغيرة الافتراضية لا تتأثر).'
+    }
+  ],
+  lab:'داخل مختبرك: شغّل ping بين Kali وUbuntu VM على شبكة Host-Only، ولاحظ الـ TTL المختلف حسب نظام التشغيل — فرق بسيط لكنه أحد أساليب OS Fingerprinting الأولية. بعدها فعّل جدار حماية (ufw) على Ubuntu VM واحظر ICMP، وشاهد كيف يتغير سلوك ping (Request timeout) رغم أن الجهاز يعمل فعليًا ويستجيب لأي بروتوكول آخر.'
+},
+
+ip: {
+  name:'ip', category:'Networking · إدارة الواجهات', color:'#3D8BFD',
+  summary:'أداة Linux الحديثة لإدارة عناوين IP والواجهات وجداول التوجيه — البديل الرسمي لأوامر ifconfig/route/arp القديمة.',
+  overview:`<p>حزمة <strong>iproute2</strong> التي تنتمي إليها <strong>ip</strong> حلّت محل أدوات net-tools القديمة (ifconfig, route, arp) في كل التوزيعات الحديثة تقريبًا. البنية موحّدة: <code>ip &lt;object&gt; &lt;command&gt;</code> — الكائن (addr, link, route, neigh...) ثم العملية عليه (show, add, del, set).</p><p>الميزة الأهم أمنيًا: ip تعرض معلومات أدق عن حالة كل واجهة (up فعليًا أم فقط مُهيَّأة، متصلة بكابل أم لا) مما يجعلها أداة تشخيص أولى قبل أي فحص شبكة خارجي.</p>`,
+  commands:[
+    {
+      title:'عرض عناوين IP والواجهات', shell:'bash',
+      syntax:'ip [-4|-6] [-br] addr show [dev <iface>]',
+      desc:'يعرض كل واجهات الشبكة على الجهاز مع عناوين IP المرتبطة بها وحالتها.',
+      flags:[
+        ['addr / a','الكائن المقصود: العناوين (يمكن اختصاره لحرف واحد a).'],
+        ['-br','عرض مختصر — سطر واحد لكل واجهة بدل التفصيل الكامل.'],
+        ['-4','إظهار عناوين IPv4 فقط.'],
+        ['-6','إظهار عناوين IPv6 فقط.'],
+        ['show / add / del','العملية: عرض، أو إضافة عنوان جديد، أو حذف عنوان.']
+      ],
+      examples:[
+        ['ip addr show','عرض كل الواجهات وعناوينها بالتفصيل الكامل.'],
+        ['ip -br addr','عرض مختصر سطر واحد لكل واجهة — مفيد للمسح السريع.'],
+        ['sudo ip addr add 192.168.1.10/24 dev eth0','إضافة عنوان IP يدويًا لواجهة (مؤقت، يُفقَد عند إعادة التشغيل ما لم يُحفظ في ملف الإعدادات).']
+      ],
+      sample:`2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:4a:1c:9e brd ff:ff:ff:ff:ff:ff
+    inet 192.168.56.101/24 brd 192.168.56.255 scope global eth0
+       valid_lft forever preferred_lft forever`,
+      outputExplain:'UP يعني الواجهة مفعّلة برمجيًا، وLOWER_UP يعني الكابل/الرابط الفيزيائي متصل فعليًا (وجود UP بدون LOWER_UP شائع جدًا في مشاكل "الشبكة لا تعمل" — الواجهة مهيّأة لكن لا يوجد اتصال فعلي). link/ether هو عنوان MAC. inet 192.168.56.101/24 هو عنوان IPv4 مع قناع الشبكة بصيغة CIDR. scope global يعني قابل للتوجيه خارج الشبكة المحلية، مقابل scope link الذي يعني محلي فقط.',
+      when:'أول أمر تكتبه على أي جهاز Linux لمعرفة عنوانه الحالي، والتأكد أن الواجهة up فعليًا وحصلت على IP من DHCP أو لا.'
+    },
+    {
+      title:'جدول التوجيه (Routing Table)', shell:'bash',
+      syntax:'ip route show',
+      desc:'يعرض القواعد التي يتبعها النظام لتحديد أي بوابة (gateway) وأي واجهة يستخدم لكل نطاق شبكة وجهة.',
+      flags:[
+        ['route / r','الكائن: جدول التوجيه.'],
+        ['add &lt;net&gt; via &lt;gw&gt; dev &lt;iface&gt;','إضافة مسار جديد يدويًا عبر بوابة محددة.'],
+        ['del &lt;net&gt;','حذف مسار موجود.']
+      ],
+      examples:[
+        ['ip route show','عرض جدول التوجيه الحالي بكل مساراته.'],
+        ['sudo ip route add default via 192.168.1.1','تعيين البوابة الافتراضية (Default Gateway) يدويًا.']
+      ],
+      sample:`default via 192.168.56.1 dev eth0 proto dhcp metric 100
+192.168.56.0/24 dev eth0 proto kernel scope link src 192.168.56.101`,
+      outputExplain:'السطر default هو المسار المستخدم لأي وجهة غير مذكورة صراحة (عادة الإنترنت) — proto dhcp يعني هذا المسار وصل تلقائيًا من خادم DHCP. السطر الثاني scope link يعني شبكة محلية مباشرة (192.168.56.0/24) يمكن الوصول لها بدون المرور عبر أي راوتر وسيط.',
+      when:'عند تشخيص حالة "الجهاز متصل بالشبكة المحلية لكن لا يصل للإنترنت" — السبب الأشهر هو غياب default route صحيح أو بوابة خاطئة.'
+    }
+  ],
+  lab:'قارن ناتج ip addr وip route قبل وبعد التبديل بين وضعي NAT وHost-Only في VirtualBox، ولاحظ كيف يتغير الـ scope وdefault route ونطاق الشبكة المرئي بالكامل.'
+},
+
+traceroute: {
+  name:'traceroute', category:'Networking · تشخيص مسار', color:'#3D8BFD',
+  summary:'يكشف سلسلة الراوترات (القفزات/hops) التي تمر بها حزمك من جهازك حتى الوجهة، عبر استغلال حقل TTL في رأس IP.',
+  overview:`<p>تعمل traceroute بحيلة ذكية: ترسل حزمًا بقيمة <strong>TTL</strong> تبدأ من 1 ثم تزداد تدريجيًا. كل راوتر يستقبل حزمة TTL=0 يُهملها ويرسل رد <strong>ICMP Time Exceeded</strong> يحمل عنوانه. بتكرار هذا مع TTL=1، ثم 2، ثم 3...، تحصل على عنوان كل راوتر بالترتيب حتى الوجهة.</p><p>على Linux تُسمى traceroute وتستخدم حزم UDP افتراضيًا على منافذ عشوائية عالية، بينما Windows تستخدم tracert وتعتمد على ICMP افتراضيًا — لذلك قد تختلف النتائج بين النظامين لنفس الوجهة تمامًا بسبب اختلاف سياسات الجدران النارية تجاه كل بروتوكول.</p>`,
+  commands:[
+    {
+      title:'تتبع المسار', shell:'bash (tracert على Windows)',
+      syntax:'traceroute [OPTIONS] <host>',
+      desc:'يطبع كل قفزة على المسار مع زمن الاستجابة لها، مما يسمح بتحديد أين بالضبط تحدث مشكلة بطء أو انقطاع.',
+      flags:[
+        ['-n','عدم عمل DNS reverse lookup لكل قفزة — أسرع بكثير وأنظف للقراءة.'],
+        ['-m &lt;ttl&gt;','أقصى عدد قفزات يُحاول الوصول إليها قبل التوقف (الافتراضي 30).'],
+        ['-q &lt;n&gt;','عدد المحاولات المرسلة لكل قفزة (الافتراضي 3).'],
+        ['-I','استخدام ICMP بدل UDP الافتراضي.'],
+        ['-T','استخدام TCP SYN بدل UDP — يفيد عندما يحظر جدار ناري UDP/ICMP لكن يسمح بحركة TCP عادية.'],
+        ['-p &lt;port&gt;','تحديد بورت البداية (في وضع UDP) أو البورت الهدف (في وضع TCP، مع -T).']
+      ],
+      examples:[
+        ['traceroute -n google.com','تتبع بدون بحث DNS لكل قفزة — النسخة الأسرع والأكثر قابلية للقراءة.'],
+        ['sudo traceroute -T -p 443 google.com','تتبع باستخدام TCP SYN على بورت 443 بدل UDP — يفيد عندما يحظر الجدار الناري UDP التقليدي.']
+      ],
+      sample:`1  192.168.56.1  0.412 ms  0.389 ms  0.355 ms
+2  10.0.2.2  0.601 ms  0.588 ms  0.570 ms
+3  * * *
+4  142.250.185.14  14.221 ms  13.998 ms  14.105 ms`,
+      outputExplain:'كل سطر قفزة واحدة، وبه 3 أزمنة RTT لأن الأداة أرسلت 3 حزم افتراضيًا لكل TTL. علامات * * * تعني عدم استلام رد — إما أن الراوتر لا يرسل ICMP Time Exceeded أصلًا (سلوك شائع لأسباب أمنية)، أو أن جدارًا ناريًا أسقط الحزمة، وليس بالضرورة انقطاع المسار (لاحظ أن القفزة 4 استجابت بشكل طبيعي رغم فشل القفزة 3).',
+      when:'يُستخدم لتحديد أين تحديدًا على المسار تحدث مشكلة (بطء أو انقطاع)، بخلاف ping الذي يخبرك فقط "هل يوجد اتصال" دون تفاصيل المسار. يُستخدم أيضًا في الاستطلاع لفهم البنية التقريبية لشبكة الهدف.'
+    }
+  ],
+  lab:'قارن نتيجة traceroute لنفس الهدف باستخدام UDP الافتراضي، ثم -I (ICMP)، ثم -T (TCP) — ستلاحظ اختلافات كبيرة حسب سياسة الجدار الناري في كل قفزة، وهذا بالضبط سبب وجود الخيارات الثلاثة.'
+},
+
+nslookup: {
+  name:'nslookup', category:'Networking · DNS', color:'#3D8BFD',
+  summary:'أداة استعلام DNS تفاعلية وغير تفاعلية، موجودة على كل الأنظمة تقريبًا — أبسط من dig لكن أقل تفصيلًا.',
+  overview:`<p>nslookup أقدم من dig وأبسط منها، وما زالت مفيدة كأداة سريعة متاحة افتراضيًا على Windows وLinux وmacOS معًا. تعمل في وضعين: غير تفاعلي (استعلام واحد ثم خروج) أو تفاعلي (تشغيلها بدون آرجيومنتس يدخلك لوضع بـ رمز > تكتب فيه استعلامات متتالية).</p>`,
+  commands:[
+    {
+      title:'استعلام أساسي', shell:'bash / cmd',
+      syntax:'nslookup <domain> [dns-server]',
+      desc:'يستعلم عن سجل A (عنوان IPv4) لنطاق معيّن، باستخدام resolver النظام الافتراضي أو خادم محدد.',
+      flags:[
+        ['-type=&lt;TYPE&gt;','تحديد نوع السجل المطلوب: A, AAAA, MX, NS, TXT, CNAME...'],
+        ['[dns-server]','آرجيومنت اختياري ثانٍ — إجبار الاستعلام على استخدام خادم DNS محدد بدل الافتراضي.']
+      ],
+      examples:[
+        ['nslookup example.com','استعلام سجل A الافتراضي باستخدام resolver النظام.'],
+        ['nslookup -type=MX example.com','معرفة خوادم البريد (Mail Exchange) المسؤولة عن استقبال بريد النطاق.'],
+        ['nslookup example.com 8.8.8.8','إجبار الاستعلام على استخدام خادم DNS جوجل تحديدًا — مفيد لمقارنة نتائج مختلفة بسبب تخزين مؤقت (caching) متفاوت بين الخوادم.']
+      ],
+      sample:`Server:		127.0.0.53
+Address:	127.0.0.53#53
+
+Non-authoritative answer:
+Name:	example.com
+Address: 93.184.216.34`,
+      outputExplain:'Server/Address في الأعلى هو خادم DNS resolver الذي أجاب فعليًا (غالبًا resolver محلي مثل systemd-resolved، وليس الخادم الرسمي للنطاق)، ولهذا مكتوب "Non-authoritative answer" — أي أن الجواب جاء من ذاكرة تخزين مؤقت (cache) وليس مباشرة من الخادم المُخوَّل (Authoritative) للنطاق.',
+      when:'خطوة سريعة أولى للتأكد أن نطاقًا يُحلَّل (resolve) بشكل صحيح، أو لمعرفة IP سريعًا بدون تفاصيل إضافية.'
+    }
+  ],
+  lab:'قارن نتيجة nslookup لنفس النطاق باستخدام resolver جهازك، ثم مع 1.1.1.1، ثم مع 8.8.8.8، ولاحظ فروقات التخزين المؤقت (قيمة TTL المتبقية) وأحيانًا عناوين anycast مختلفة.'
+},
+
+dig: {
+  name:'dig', category:'Networking · DNS', color:'#3D8BFD',
+  summary:'أداة DNS احترافية أكثر تفصيلًا وتحكمًا من nslookup — الخيار المفضّل في العمل الأمني ومرحلة الاستطلاع (Recon).',
+  overview:`<p><strong>dig</strong> (Domain Information Groper) تعرض تفاصيل الاستعلام كاملة: الرأس (HEADER) بحالته، قسم السؤال، قسم الإجابة، وأحيانًا أقسام Authority وAdditional — وكل هذا بصيغة يسهل قراءتها أو معالجتها في سكربت.</p><p>تدعم أيضًا وضع <code>+trace</code> الذي يتتبع الاستعلام يدويًا بدءًا من خوادم الجذر (Root) مرورًا بخادم النطاق الأعلى (TLD مثل .com) وصولًا للخادم الرسمي للنطاق — طريقة ممتازة لفهم سلسلة الـ DNS delegation بالكامل بدل الثقة بإجابة الـ resolver مباشرة.</p>`,
+  commands:[
+    {
+      title:'استعلام مفصّل', shell:'bash',
+      syntax:'dig [@server] <domain> [TYPE] [OPTIONS]',
+      desc:'الصيغة القياسية: خادم اختياري، النطاق، نوع السجل، ثم خيارات تنسيق الإخراج.',
+      flags:[
+        ['@server','تحديد خادم DNS معيّن للاستعلام منه مباشرة بدل الـ resolver الافتراضي.'],
+        ['TYPE','نوع السجل: A, AAAA, MX, NS, TXT, ANY...'],
+        ['+short','إظهار الإجابة فقط بدون أي تفاصيل إضافية — مثالي للسكربتات.'],
+        ['+trace','تتبّع الاستعلام خطوة بخطوة بدءًا من خوادم الجذر.'],
+        ['+noall +answer','تصفية الإخراج لعرض قسم الإجابة (ANSWER SECTION) فقط.'],
+        ['-x &lt;ip&gt;','استعلام عكسي (Reverse Lookup) — يبني تلقائيًا طلب PTR لمعرفة اسم النطاق من عنوان IP.']
+      ],
+      examples:[
+        ['dig example.com MX +short','أسرع طريقة لمعرفة خوادم البريد فقط بدون أي ضوضاء إضافية.'],
+        ['dig @8.8.8.8 example.com','استعلام مباشر لخادم DNS جوجل تحديدًا.'],
+        ['dig +trace example.com','تتبّع الاستعلام بدءًا من Root Servers مرورًا بـ TLD (.com) وصولًا لخادم النطاق الرسمي — يفيد لفهم سلسلة التفويض (delegation) كاملة.'],
+        ['dig -x 93.184.216.34','استعلام عكسي لمعرفة اسم النطاق المرتبط بعنوان IP.']
+      ],
+      sample:`; <<>> DiG 9.18.1 <<>> example.com
+;; QUESTION SECTION:
+;example.com.			IN	A
+
+;; ANSWER SECTION:
+example.com.		86400	IN	A	93.184.216.34
+
+;; Query time: 21 msec
+;; SERVER: 127.0.0.53#53(127.0.0.53)`,
+      outputExplain:'QUESTION SECTION هو بالضبط ما طلبته. ANSWER SECTION يحوي: اسم النطاق، TTL بالثواني (86400 = يوم كامل قبل انتهاء صلاحية الكاش)، فئة IN (Internet)، نوع السجل A، ثم القيمة (عنوان IP). Query time هو زمن استجابة الخادم الذي أُرسل له الاستعلام تحديدًا.',
+      when:'الأداة الأساسية في مرحلة Reconnaissance & OSINT: اكتشاف سجلات MX/TXT/NS، فهم بنية DNS لنطاق مستهدف، التحقق من إعدادات SPF/DKIM/DMARC (المخزَّنة في سجلات TXT)، وتشخيص مشاكل DNS المعقدة عبر +trace.'
+    }
+  ],
+  lab:'استخدم dig +trace على نطاق تدريبي، وارسم يدويًا سلسلة التفويض (delegation) من Root إلى TLD إلى خادم النطاق. ثم استخدم dig TXT لمعرفة سجلات SPF إن وُجدت.'
+},
+
+curl: {
+  name:'curl', category:'Networking / Web', color:'#3D8BFD',
+  summary:'أداة نقل بيانات عبر الشبكة تدعم عشرات البروتوكولات (HTTP/HTTPS/FTP وغيرها) — حجر الأساس في اختبار وأتمتة أي تفاعل مع الويب.',
+  overview:`<p>بخلاف المتصفح الذي يعرض صفحة مُنسَّقة ويشغّل JavaScript تلقائيًا، تعطيك <strong>curl</strong> الاستجابة الخام تمامًا كما وصلت من الخادم: الـ status line، الـ headers، والـ body — وهذا بالضبط ما تحتاجه لفهم سلوك تطبيق ويب أو API بدقة.</p><p>لأنها قابلة للبرمجة بالكامل (سكربت bash، أو استدعاء من بايثون)، فهي العمود الفقري لأتمتة اختبارات الويب: تسجيل دخول، حفظ التوكن/الكوكي الناتج، ثم استخدامه في طلبات لاحقة — سلسلة تتكرر في كل اختبار اختراق تطبيق ويب تقريبًا.</p>`,
+  commands:[
+    {
+      title:'طلب GET وفحص Headers', shell:'bash / cmd',
+      syntax:'curl [OPTIONS] <URL>',
+      desc:'بدون خيارات، تطبع فقط جسم الاستجابة (body). لرؤية الصورة الكاملة (status code + headers) تحتاج خيارات إضافية.',
+      flags:[
+        ['-i','تضمين response headers مع الـ body في الإخراج.'],
+        ['-I','طلب HEAD فقط — headers بدون تحميل الـ body إطلاقًا (أسرع لفحص headers فقط).'],
+        ['-L','اتباع إعادة التوجيه (Redirects) تلقائيًا بدل التوقف عند أول 3xx.'],
+        ['-s','وضع صامت — إخفاء شريط التقدم ورسائل الحالة.'],
+        ['-v','وضع تفصيلي (verbose) — يعرض كامل الـ TLS handshake والـ headers المرسلة والمستقبلة، سطرًا بسطر.'],
+        ['-k / --insecure','تجاهل التحقق من صحة شهادة TLS — للاختبار في المختبر فقط، وليس ضد أنظمة حقيقية.'],
+        ['-o &lt;file&gt;','حفظ الإخراج في ملف بدل طباعته.']
+      ],
+      examples:[
+        ['curl -I https://example.com','فحص headers فقط بسرعة — مفيد لمعرفة نوع الخادم (Server header)، وجود WAF، وسياسات أمان مثل CSP وHSTS.'],
+        ['curl -s -o /dev/null -w "%{http_code}\\n" https://example.com','طباعة كود الحالة HTTP فقط دون أي شيء آخر — مثالي داخل السكربتات.'],
+        ['curl -v https://example.com','عرض تفاصيل TLS handshake وHeaders كاملة للتشخيص العميق.']
+      ],
+      sample:`HTTP/1.1 200 OK
+Server: nginx/1.18.0
+Content-Type: text/html; charset=UTF-8
+Strict-Transport-Security: max-age=63072000`,
+      outputExplain:'أول سطر هو status line (البروتوكول وكود الحالة 200 OK). بعده response headers: Server يكشف نوع ونسخة الخادم (معلومة استطلاعية مفيدة)، وStrict-Transport-Security (HSTS) يخبرك أن الموقع يفرض HTTPS على المتصفحات التي تدعمه — غياب هذا الهيدر عادة نقطة تُذكر في تقارير تدقيق أمن الويب.',
+      when:'أول أمر لفحص سلوك أي موقع أو API من الطرفية دون فتح متصفح — خصوصًا لفحص الـ headers الأمنية بسرعة.'
+    },
+    {
+      title:'إرسال بيانات (POST) واستخدام التوكن', shell:'bash',
+      syntax:'curl -X POST -H "Content-Type: application/json" -d \'{...}\' <URL>',
+      desc:'إرسال بيانات JSON لنقطة API عبر POST — الطريقة القياسية لاختبار أي API من سطر الأوامر، ثم استخدام أي توكن ناتج في طلب لاحق.',
+      flags:[
+        ['-X &lt;METHOD&gt;','تحديد فعل HTTP: GET, POST, PUT, DELETE...'],
+        ['-H "Header: value"','إضافة header مخصص — يمكن تكرار الخيار لإضافة أكثر من واحد.'],
+        ['-d \'data\'','إرسال بيانات في جسم الطلب، ويجعله POST تلقائيًا إن لم تُحدَّد -X صراحة.'],
+        ['-u user:pass','مصادقة أساسية (HTTP Basic Authentication).'],
+        ['-b "cookie=value"','إرسال كوكيز محددة مع الطلب.'],
+        ['-c &lt;file&gt;','حفظ الكوكيز المستلمة في ملف لاستخدامها في طلبات لاحقة (jar).']
+      ],
+      examples:[
+        ['curl -X POST -H "Content-Type: application/json" -d \'{"user":"admin","pass":"test"}\' https://target.lab/api/login','محاكاة تسجيل دخول عبر API لملاحظة كيف يتعامل التطبيق مع بيانات JSON ورموز الأخطاء المختلفة.'],
+        ['curl -H "Authorization: Bearer <token>" https://target.lab/api/profile','استخدام توكن حصلت عليه من طلب تسجيل دخول سابق للوصول إلى مسار محمي.']
+      ],
+      sample:`HTTP/1.1 200 OK
+Content-Type: application/json
+Set-Cookie: session=abc123; HttpOnly
+
+{"status":"ok","token":"eyJhbGciOi..."}`,
+      outputExplain:'Set-Cookie يوضّح كيف تُدار الجلسة، وHttpOnly مهم أمنيًا لأنه يمنع الوصول للكوكي عبر JavaScript (يقلل تأثير أي ثغرة XSS محتملة). في الـ body، الحقل token هو JWT — نقطة يجب فحصها بعمق لاحقًا في مرحلة أمن الويب (هل التوقيع يُتحقَّق منه فعليًا في الخادم؟).',
+      when:'curl هو العمود الفقري لأي اختبار ويب من الطرفية: فحص headers أمنية مفقودة، تجربة payloads يدويًا، أتمتة سلاسل طلبات (تسجيل دخول ثم استخدام الكوكي/التوكن الناتج)، أو تحميل أدوات على الهدف بعد الوصول الأولي.'
+    }
+  ],
+  lab:'شغّل OWASP Juice Shop محليًا عبر Docker، واستخدم curl لتسجيل دخول عبر مسار API الخاص به، احفظ التوكن الناتج، ثم استخدمه في طلب لاحق بهيدر Authorization للوصول لمسار محمي — هذا بالضبط ما يفعله أي مختبر اختراق قبل اللجوء لأداة أثقل مثل Burp Suite.'
+},
+
+ss: {
+  name:'ss', category:'Networking · فحص محلي', color:'#3D8BFD',
+  summary:'أداة فحص المقابس (Sockets) على Linux — البديل الحديث لـ netstat، تعرض الاتصالات النشطة والمنافذ المفتوحة على الجهاز نفسه.',
+  overview:`<p>بخلاف Nmap الذي يفحص جهازًا من الخارج عبر الشبكة، تعمل <strong>ss</strong> محليًا على الجهاز نفسه وتقرأ حالة الـ sockets مباشرة من النواة (kernel) — أسرع وأدق بكثير، وتُظهر بالضبط أي عملية (process) تملك كل اتصال، وهو ما لا يمكن لفحص خارجي معرفته.</p>`,
+  commands:[
+    {
+      title:'عرض المنافذ المستمعة (Listening)', shell:'bash',
+      syntax:'ss [OPTIONS]',
+      desc:'دون خيارات تعرض كل الـ sockets، لكن التوليفة الأشهر تجمع عدة خيارات معًا لعرض المنافذ المستمعة فقط بمعلومات مفيدة.',
+      flags:[
+        ['-t','عرض اتصالات TCP فقط.'],
+        ['-u','عرض اتصالات UDP فقط.'],
+        ['-l','عرض الـ sockets في وضع الاستماع (Listen) فقط.'],
+        ['-n','عرض أرقام بدل حل الأسماء — أسرع وأوضح.'],
+        ['-p','عرض اسم العملية وPID المرتبطين بالـ socket (يحتاج صلاحيات root غالبًا لرؤية العمليات التابعة لمستخدمين آخرين).'],
+        ['-a','عرض كل الحالات (Listening + Established + ...) وليس فقط الاستماع.']
+      ],
+      examples:[
+        ['ss -tulpn','التوليفة الأشهر — كل منافذ TCP وUDP المستمعة، بالأرقام، مع اسم العملية المالكة.'],
+        ['ss -t state established','عرض فقط اتصالات TCP النشطة حاليًا — مفيد في الاستجابة للحوادث لمعرفة من متصل بالجهاز الآن.']
+      ],
+      sample:`Netid  State   Recv-Q Send-Q  Local Address:Port   Peer Address:Port  Process
+tcp    LISTEN  0      128     0.0.0.0:22           0.0.0.0:*          users:(("sshd",pid=812,fd=3))
+tcp    LISTEN  0      511     127.0.0.1:3306        0.0.0.0:*          users:(("mysqld",pid=1204,fd=21))`,
+      outputExplain:'LISTEN تعني الخدمة تنتظر اتصالات واردة. السطر الأول: 0.0.0.0:22 يعني SSH يستمع على كل واجهات الشبكة (متاح من خارج الجهاز). السطر الثاني: 127.0.0.1:3306 يعني MySQL يستمع فقط على localhost (غير متاح من خارج الجهاز نفسه) — فرق حاسم عند تدقيق تعريض خدمات لم يُقصد تعريضها للشبكة الخارجية.',
+      when:'خطوة أساسية في تدقيق الجهاز نفسه من الداخل (وليس فحصًا خارجيًا): ما الخدمات التي تعمل فعليًا؟ هل خدمة كان يجب أن تكون على localhost فقط تستمع على 0.0.0.0 بالخطأ؟ تُستخدم أيضًا في الاستجابة للحوادث للبحث عن اتصالات صادرة مشبوهة من الجهاز.'
+    }
+  ],
+  lab:'شغّل خدمة بسيطة (python3 -m http.server 8000) على Ubuntu VM، ثم استخدم ss -tulpn لتأكيد أنها تستمع، وقارن الفرق عندما تربطها بـ 127.0.0.1:8000 فقط مقابل 0.0.0.0:8000 — ثم جرّب الوصول إليها من جهاز آخر على الشبكة في كل حالة.'
+},
+
+tcpdump: {
+  name:'tcpdump', category:'Networking · التقاط حزم', color:'#3D8BFD',
+  summary:'أداة التقاط وتحليل حزم الشبكة من سطر الأوامر — بدون واجهة رسومية، وضرورية على السيرفرات التي لا تملك GUI.',
+  overview:`<p><strong>tcpdump</strong> هي النسخة الكلاسيكية من تحليل الحزم، وتستخدم نفس محرك الفلترة (BPF — Berkeley Packet Filter) الذي يستخدمه Wireshark لفلاتر الالتقاط. الفرق الجوهري: tcpdump لا تفهم تفاصيل البروتوكولات العليا (HTTP مثلًا) بعمق كما يفعل Wireshark، لكنها أخف وأسرع ومتاحة بشكل شبه مضمون على أي سيرفر Linux.</p>`,
+  commands:[
+    {
+      title:'التقاط حزم مباشر', shell:'bash',
+      syntax:'sudo tcpdump [OPTIONS] [FILTER]',
+      desc:'يلتقط الحزم المارة على واجهة شبكة محددة، مع إمكانية فلترتها بصيغة BPF أثناء الالتقاط نفسه.',
+      flags:[
+        ['-i &lt;iface&gt;','تحديد واجهة الشبكة، أو any لكل الواجهات.'],
+        ['-n','عدم حل أسماء IP (تسريع وتفادي طلبات DNS إضافية قد تُدخل ضوضاء في الالتقاط نفسه).'],
+        ['-nn','مثل -n لكن أيضًا بدون حل أسماء المنافذ — الأفضل للتحليل الدقيق (تشاهد 443 بدل https).'],
+        ['-c &lt;count&gt;','عدد الحزم المُراد التقاطها ثم التوقف تلقائيًا.'],
+        ['-w &lt;file&gt;','حفظ الحزم الخام في ملف .pcap لفتحه لاحقًا في Wireshark.'],
+        ['-r &lt;file&gt;','قراءة ملف pcap محفوظ سابقًا بدل التقاط حي.'],
+        ['-X','عرض محتوى كل حزمة بصيغة hex + ASCII جنبًا إلى جنب.']
+      ],
+      examples:[
+        ['sudo tcpdump -i eth0 -nn port 80','التقاط كل حركة HTTP على الواجهة eth0.'],
+        ['sudo tcpdump -i eth0 -nn host 192.168.1.50 and port 443','التقاط الحركة من/إلى جهاز محدد على بورت HTTPS فقط — استخدام مرشح BPF بمعاملي host وand معًا.'],
+        ['sudo tcpdump -i eth0 -w capture.pcap','حفظ كل الحركة في ملف لتحليلها لاحقًا في Wireshark بواجهة رسومية أكثر راحة.']
+      ],
+      sample:`14:22:01.442331 IP 192.168.56.101.51422 > 93.184.216.34.443: Flags [S], seq 123456789, win 64240, length 0
+14:22:01.456102 IP 93.184.216.34.443 > 192.168.56.101.51422: Flags [S.], seq 987654321, ack 123456790, win 65535, length 0
+14:22:01.456210 IP 192.168.56.101.51422 > 93.184.216.34.443: Flags [.], ack 987654322, win 64240, length 0`,
+      outputExplain:'هذه بالضبط الـ TCP 3-Way Handshake: [S] هي SYN (طلب بدء اتصال)، [S.] هي SYN-ACK (رد الخادم)، [.] هي ACK (تأكيد العميل) — بعد هذا السطر الثالث يبدأ نقل البيانات الفعلي (TLS handshake في حالة HTTPS). seq وack هما أرقام تسلسل تضمن ترتيب البيانات وعدم فقدها.',
+      when:'يُستخدم عندما لا تملك واجهة رسومية (سيرفر Linux عن بُعد عبر SSH)، أو تريد التقاطًا سريعًا ومُفلترًا فورًا بدون فتح تطبيق ثقيل. الاستخدام الشائع فعليًا: التقاط بـ tcpdump على السيرفر البعيد، ثم نقل ملف .pcap وتحليله بعمق في Wireshark لاحقًا.'
+    }
+  ],
+  lab:'شغّل tcpdump -i eth0 -w cap.pcap على Ubuntu VM، ثم من جهاز آخر على نفس الشبكة نفّذ curl لموقع HTTP غير مشفّر، أوقف الالتقاط، وافتح الملف في Wireshark — ستتمكن من رؤية بيانات الطلب نصًا صريحًا لأن HTTP غير مشفّر، وهذا بالضبط سبب أهمية HTTPS.'
+},
+
+wireshark: {
+  name:'Wireshark', category:'Networking · تحليل حزم', color:'#3D8BFD',
+  summary:'محلل حزم بواجهة رسومية يفهم مئات البروتوكولات تلقائيًا ويعرضها بشكل مقروء بدل hex خام — الأداة المرجعية لتحليل الشبكات بعمق.',
+  overview:`<p>Wireshark تعمل على مستويين من الفلاتر يجب عدم الخلط بينهما: <strong>Capture Filters</strong> (بصيغة BPF نفسها المستخدمة في tcpdump، تُطبَّق قبل حفظ أي حزمة وتقتصر على العناوين والمنافذ والبروتوكولات الأساسية)، و<strong>Display Filters</strong> (لغتها الخاصة الأقوى بكثير، تُطبَّق بعد الالتقاط على حزم موجودة فعلًا، وتفهم حقول كل بروتوكول بعمق مثل http.request.method أو tcp.flags.syn).</p><p>لها أيضًا نسخة سطر أوامر تُسمى <strong>tshark</strong> تستخدم نفس محرك تحليل البروتوكولات بالضبط، مفيدة على سيرفرات بدون واجهة رسومية أو داخل سكربتات أتمتة.</p>`,
+  commands:[
+    {
+      title:'مرشحات الالتقاط (Capture Filters)', shell:'BPF syntax',
+      syntax:'<protocol> [and/or/not] <host|port|net>',
+      desc:'تُطبَّق قبل حفظ أي حزمة على القرص — نفس صيغة tcpdump، سريعة لكن محدودة (لا تفهم تفاصيل داخل البروتوكولات العليا مثل HTTP).',
+      flags:[
+        ['host &lt;ip&gt;','حركة من/إلى عنوان IP محدد.'],
+        ['port &lt;n&gt;','حركة على بورت محدد.'],
+        ['tcp / udp / icmp','تحديد البروتوكول.'],
+        ['net &lt;cidr&gt;','حركة من/إلى نطاق شبكة كامل.'],
+        ['and / or / not','دمج عدة شروط معًا.']
+      ],
+      examples:[
+        ['host 192.168.1.50 and port 443','التقاط حركة HTTPS من/إلى جهاز محدد فقط، لتقليل حجم الالتقاط قبل حتى بدء التحليل.'],
+        ['tcp port 80 or tcp port 443','التقاط كل حركة الويب (HTTP وHTTPS معًا) وتجاهل باقي البروتوكولات.']
+      ],
+      when:'استخدمه عندما تعرف مسبقًا نطاق ما تريد التقاطه ولا تحتاج كل شيء — يقلّل الحمل ويجعل ملف الـ pcap الناتج أخف وأسهل للتحليل لاحقًا.'
+    },
+    {
+      title:'مرشحات العرض (Display Filters)', shell:'Wireshark syntax',
+      syntax:'<field><operator><value> [&& / || <field><operator><value>]',
+      desc:'أقوى بكثير من مرشحات الالتقاط لأنها تفهم بنية كل بروتوكول حقلًا حقلًا — تُطبَّق على حزم موجودة أصلًا سواء أثناء التقاط حي أو داخل ملف مفتوح.',
+      flags:[
+        ['ip.addr==&lt;ip&gt;','كل الحركة من/إلى IP محدد، بالاتجاهين معًا.'],
+        ['tcp.port==&lt;n&gt;','كل حركة TCP على بورت محدد.'],
+        ['http.request.method=="POST"','فلترة طلبات HTTP POST فقط.'],
+        ['tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0','حزم SYN فقط بدون ACK — أي بدايات اتصالات جديدة، مفيد لاكتشاف عمليات فحص منافذ (port scans).'],
+        ['dns.qry.name contains "example"','بحث نصي داخل أسماء استعلامات DNS.']
+      ],
+      examples:[
+        ['http.request.method=="POST" && ip.addr==192.168.1.50','عرض طلبات POST القادمة/الذاهبة لجهاز محدد فقط — مفيد لتتبع بيانات نماذج تسجيل الدخول.'],
+        ['tcp.flags.syn==1 && tcp.flags.ack==0','كشف محاولات فحص منافذ (SYN scan) على الشبكة — كل حزمة SYN بدون ACK هي محاولة فتح اتصال جديد.']
+      ],
+      sample:`No.  Time      Source          Destination     Protocol  Length  Info
+12   0.442331  192.168.56.101  93.184.216.34   TCP       74      51422 → 443 [SYN] Seq=0
+13   0.456102  93.184.216.34   192.168.56.101  TCP       74      443 → 51422 [SYN, ACK] Seq=0 Ack=1
+45   0.812004  192.168.56.101  93.184.216.34   TLSv1.2   571     Client Hello`,
+      outputExplain:'كل صف حزمة واحدة مرقّمة تسلسليًا. Wireshark يلوّن الصفوف تلقائيًا حسب البروتوكول وحالته (أخضر لحركة سليمة، أحمر لأخطاء TCP مثلًا). عمود Info يلخّص محتوى الحزمة بلغة مفهومة مباشرة بدل قراءة hex خام — هذا الفرق الجوهري بينه وبين tcpdump الخام، وأحد أهم أسباب استخدام Wireshark للتحليل العميق.',
+      when:'عندما تحتاج فهمًا عميقًا لما يحدث فعليًا على السلك: تحليل هجوم مشتبه به من ملف pcap، تتبع محادثة TCP كاملة عبر "Follow TCP Stream"، تشخيص مشاكل أداء شبكة، أو التحقق العملي من سلوك بروتوكول تتعلمه نظريًا.'
+    },
+    {
+      title:'tshark — نفس المحرك من الطرفية', shell:'bash',
+      syntax:'tshark -i <iface> -Y "<display filter>" [-w <file>]',
+      desc:'إصدار سطر أوامر من Wireshark يستخدم نفس محرك تحليل البروتوكولات بالضبط، بدون واجهة رسومية — مفيد على سيرفرات بدون GUI أو داخل سكربتات آلية.',
+      flags:[
+        ['-i &lt;iface&gt;','واجهة الالتقاط.'],
+        ['-Y "&lt;filter&gt;"','فلتر عرض (نفس صيغة Wireshark)، يُطبَّق أثناء الالتقاط الحي أيضًا.'],
+        ['-w &lt;file&gt;','حفظ الحزم في ملف pcap.'],
+        ['-r &lt;file&gt;','قراءة ملف pcap محفوظ.'],
+        ['-T fields -e &lt;field&gt;','استخراج حقول محددة فقط كنص، مثالي للأتمتة والمعالجة ببرنامج آخر.']
+      ],
+      examples:[
+        ['tshark -i eth0 -Y "http.request"','عرض طلبات HTTP فقط أثناء الالتقاط الحي، دون الحاجة لواجهة رسومية.'],
+        ['tshark -r cap.pcap -T fields -e ip.src -e http.host','استخراج IP المصدر واسم المضيف من كل طلب HTTP داخل ملف محفوظ، بصيغة نصية مناسبة للمعالجة الآلية لاحقًا.']
+      ],
+      when:'عندما تحتاج قوة محرك Wireshark لكن على سيرفر بدون واجهة رسومية، أو عندما تريد دمج تحليل الحزم داخل سكربت آلي بدل النقر اليدوي.'
+    }
+  ],
+  lab:'هذا بالضبط تمرين هذه المرحلة: ابدأ التقاطًا في Wireshark، افتح متصفحًا وزُر موقعًا يستخدم HTTP (وليس HTTPS)، استخدم فلتر العرض http.request، ثم اضغط يمين على أي حزمة → Follow → HTTP Stream، وشاهد الطلب والرد الكاملين بالنص الصريح.'
+}
+
+};
+
+/* ---------------- render ---------------- */
+let uid = 0;
+const nextId = () => 'i' + (uid++);
+
+function toolSlug(name){ return name.toLowerCase().trim().replace(/\s+/g,'-').replace(/\//g,'-'); }
+
+function renderToolChip(t){
+  const slug = toolSlug(t);
+  if(TOOL_DETAIL[slug]){
+    return `<button type="button" class="chip chip-link" data-tool="${slug}">${t}</button>`;
+  }
+  return `<span class="chip chip-soon" title="صفحة تفصيلية قريبًا">${t}</span>`;
+}
+
+function citem(text){
+  const id = nextId();
+  return `<li><label class="citem" data-id="${id}"><input type="checkbox" class="track-item" data-id="${id}"><span class="txt">${text}</span></label></li>`;
+}
+
+function interactiveWidget(kind, color){
+  if(kind === 'subnet'){
+    return `<div class="tool-simulator" style="--phase-color:${color}">
+      <label>حاسبة الشبكات الفرعية — أدخل IP/CIDR (مثال: 192.168.1.0/26)</label>
+      <input type="text" class="subnet-input" placeholder="192.168.1.0/26">
+      <div class="out subnet-out"></div>
+    </div>`;
+  }
+  if(kind === 'jwt'){
+    return `<div class="tool-simulator" style="--phase-color:${color}">
+      <label>فاكّ ترميز JWT (Base64 decode فقط — للتعلّم لا للتحقق من التوقيع)</label>
+      <input type="text" class="jwt-input" placeholder="الصق توكن JWT هنا">
+      <div class="out jwt-out"></div>
+    </div>`;
+  }
+  if(kind === 'entropy'){
+    return `<div class="tool-simulator" style="--phase-color:${color}">
+      <label>حاسبة قوة كلمة المرور (تقديرية، لا تُرسل أي بيانات)</label>
+      <input type="text" class="entropy-input" placeholder="جرّب كتابة كلمة مرور وهمية">
+      <div class="out entropy-out"></div>
+    </div>`;
+  }
+  return '';
+}
+
+function renderPhase(p){
+  let html = `<section class="phase" id="${p.id}" style="--phase-color:${p.color}">
+    <div class="phase-head">
+      <span class="phase-emoji">${p.emoji}</span>
+      <span class="phase-num">${p.num}</span>
+      <h3>${p.title}</h3>
+      <span class="en">${p.en}</span>
+      <div class="phase-progress" data-phase="${p.id}"><span class="cnt">0/0</span><div class="track"><i></i></div></div>
+    </div>`;
+
+  if(p.flow){
+    html += `<div class="flow">` + p.flow.map((n,i)=> (i? `<span class="arrow">←</span>`:'') + `<span class="node">${n}</span>`).join('') + `</div>`;
+  }
+
+  p.sections.forEach(s=>{
+    html += `<div class="section-block">`;
+    if(s.h) html += `<h4>${s.h}</h4>`;
+    html += `<ul class="checklist ${s.items.length<6?'single':''}">` + s.items.map(citem).join('') + `</ul>`;
+    html += `</div>`;
+  });
+
+  if(p.tools){
+    html += `<div class="section-block"><h4>أدوات</h4><div class="chips">` + p.tools.map(renderToolChip).join('') + `</div></div>`;
+  }
+
+  if(p.interactive){
+    html += `<div class="section-block"><h4>تمرين تفاعلي</h4>${interactiveWidget(p.interactive, p.color)}</div>`;
+  }
+
+  if(p.task){
+    const id = nextId();
+    html += `<label class="callout task-item" data-id="${id}">
+      <input type="checkbox" class="track-item" data-id="${id}" style="position:absolute;opacity:0;">
+      <span class="badge">${p.task.label}</span><span class="body">${p.task.text}</span>
+    </label>`;
+  }
+  if(p.warn){ html += `<div class="callout warn"><span class="badge">تنبيه</span><span class="body">${p.warn}</span></div>`; }
+  if(p.note){ html += `<div class="callout note"><span class="badge">ملاحظة</span><span class="body">${p.note}</span></div>`; }
+
+  html += `</section>`;
+  return html;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
+
+function renderToolDetail(id){
+  const t = TOOL_DETAIL[id];
+  const view = document.getElementById('toolDetailView');
+  if(!t){
+    view.innerHTML = `<button type="button" class="td-back" id="tdBack">→ العودة إلى خارطة الطريق</button>
+      <p class="td-notfound">هذه الأداة لم تُضَف بعد كصفحة تفصيلية — يجري إضافة الأدوات مرحلةً بمرحلة، وستتوفر قريبًا.</p>`;
+    wireToolDetailEvents(view);
+    return;
+  }
+  let html = `<button type="button" class="td-back" id="tdBack">→ العودة إلى خارطة الطريق</button>`;
+  html += `<div class="td-head" style="--phase-color:${t.color}"><h2>${t.name}</h2><span class="td-cat">${t.category}</span></div>`;
+  html += `<p class="td-summary">${t.summary}</p>`;
+  html += `<div class="td-overview" style="--phase-color:${t.color}">${t.overview}</div>`;
+
+  t.commands.forEach((c,ci)=>{
+    html += `<div class="td-cmd" style="--phase-color:${t.color}">`;
+    html += `<h3>${c.title}${c.shell?`<span class="shelltag">${escapeHtml(c.shell)}</span>`:''}</h3>`;
+    html += `<div class="td-syntax"><button type="button" class="td-copy" data-copy="${escapeAttr(c.syntax)}">نسخ</button>${escapeHtml(c.syntax)}</div>`;
+    html += `<p class="td-desc">${c.desc}</p>`;
+    if(c.flags && c.flags.length){
+      html += `<table class="td-flags"><thead><tr><th>المعامل</th><th>الوصف</th></tr></thead><tbody>` +
+        c.flags.map(f=>`<tr><td>${f[0]}</td><td>${f[1]}</td></tr>`).join('') + `</tbody></table>`;
+    }
+    if(c.examples && c.examples.length){
+      html += `<div class="td-examples">` + c.examples.map(ex=>
+        `<div class="td-example"><code>${escapeHtml(ex[0])}</code><div class="explain">${ex[1]}</div></div>`
+      ).join('') + `</div>`;
+    }
+    if(c.sample){
+      html += `<div class="td-sub">مثال على الناتج</div><div class="td-output">${escapeHtml(c.sample)}</div>`;
+      if(c.outputExplain) html += `<p class="td-desc">${c.outputExplain}</p>`;
+    }
+    if(c.when){ html += `<div class="td-sub">متى ولماذا تستخدمه</div><p class="td-desc">${c.when}</p>`; }
+    html += `</div>`;
+  });
+
+  if(t.lab){
+    html += `<div class="td-lab" style="--phase-color:${t.color}"><div class="callout note"><span class="badge">تمرين في المختبر</span><span class="body">${t.lab}</span></div></div>`;
+  }
+
+  view.innerHTML = html;
+  wireToolDetailEvents(view);
+}
+
+function wireToolDetailEvents(view){
+  document.getElementById('tdBack')?.addEventListener('click', ()=>{ location.hash = ''; });
+  view.querySelectorAll('.td-copy').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const text = btn.getAttribute('data-copy') || '';
+      (navigator.clipboard?.writeText(text) || Promise.reject()).then(()=>{
+        btn.textContent = '✓'; btn.classList.add('copied');
+        setTimeout(()=>{ btn.textContent = 'نسخ'; btn.classList.remove('copied'); }, 1200);
+      }).catch(()=>{});
+    });
+  });
+}
+
+function showToolDetail(id){
+  document.querySelector('.hero').hidden = true;
+  document.getElementById('phasesRoot').hidden = true;
+  document.getElementById('toolDetailView').hidden = false;
+  renderToolDetail(id);
+  window.scrollTo(0,0);
+}
+function showRoadmap(){
+  document.querySelector('.hero').hidden = false;
+  document.getElementById('phasesRoot').hidden = false;
+  document.getElementById('toolDetailView').hidden = true;
+}
+function routeHash(){
+  const h = location.hash;
+  if(h.startsWith('#tool=')) showToolDetail(decodeURIComponent(h.slice(6)));
+  else showRoadmap();
+}
+function goToSection(id){
+  showRoadmap();
+  if(location.hash) location.hash = '';
+  requestAnimationFrame(()=>{ document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'}); });
+}
+window.addEventListener('hashchange', routeHash);
+document.addEventListener('click', (e)=>{
+  const el = e.target.closest('[data-tool]');
+  if(el && el.dataset.tool){ location.hash = 'tool=' + el.dataset.tool; }
+});
+
+function renderTracksPhase(){
+  let html = `<section class="phase" id="p16" style="--phase-color:#F4B942">
+    <div class="phase-head"><span class="phase-emoji">🧠</span><span class="phase-num">16</span><h3>اختيار مسار التخصص</h3><span class="en">Specialization</span></div>
+    <p style="color:var(--text-dim);font-size:13px;margin:10px 0 0;">بعد الأساسيات، اختر مسارًا واحدًا تتعمّق فيه:</p>
+    <div class="tracks" id="tracksGrid">`;
+  TRACKS.forEach(t=>{
+    html += `<div class="track-card" data-track="${t.id}"><div class="tc-head"><span>${t.emoji}</span><span>${t.title}</span></div><div class="tc-path">${t.path}</div></div>`;
+  });
+  html += `</div></section>`;
+  return html;
+}
+
+function renderToolsDb(){
+  let html = `<section class="phase" id="p17" style="--phase-color:#F2B441">
+    <div class="phase-head"><span class="phase-emoji">🧰</span><span class="phase-num">17</span><h3>قاعدة بيانات الأدوات</h3><span class="en">Tools Explorer</span></div>
+    <div class="section-block"><div class="tools-grid">`;
+  TOOLS_DB.forEach(t=>{
+    const has = !!TOOL_DETAIL[toolSlug(t.name)];
+    html += `<div class="tool-card${has?' chip-link':''}" ${has?`data-tool="${toolSlug(t.name)}"`:''} style="${has?'cursor:pointer;':''}"><div class="cat">${t.cat}</div><h5>${t.name}${has?' ↗':''}</h5><p>${t.desc}</p><code>${t.ex}</code></div>`;
+  });
+  html += `</div></div></section>`;
+  return html;
+}
+
+function renderListPhase(id, num, emoji, color, title, en, list, note, single){
+  let html = `<section class="phase" id="${id}" style="--phase-color:${color}">
+    <div class="phase-head"><span class="phase-emoji">${emoji}</span><span class="phase-num">${num}</span><h3>${title}</h3><span class="en">${en}</span>
+      <div class="phase-progress" data-phase="${id}"><span class="cnt">0/0</span><div class="track"><i></i></div></div>
+    </div>`;
+  if(note) html += `<div class="callout note" style="margin-top:12px;"><span class="badge">ملاحظة</span><span class="body">${note}</span></div>`;
+  html += `<div class="section-block"><ul class="checklist ${single?'single':''}">` + list.map(citem).join('') + `</ul></div>`;
+  html += `</section>`;
+  return html;
+}
+
+const root = document.getElementById('phasesRoot');
+let out = PHASES.map(renderPhase).join('');
+out += renderTracksPhase();
+out += renderToolsDb();
+out += renderListPhase('p18','18','📖','#7A8699','مسرد المصطلحات','Glossary', GLOSSARY, null, true);
+out += renderListPhase('p19','19','🎓','#8C6A26','مسارات الشهادات','Certifications', CERTS, 'الشهادات ليست شرطًا للتعلم، لكنها تساعد في تنظيم المسار.');
+out += renderListPhase('p20','20','💼','#3D8BFD','المسارات الوظيفية','Career Paths', CAREERS);
+out += renderListPhase('quick','⭐','⭐','#F4B942','المسار السريع','Fast Track', QUICKPATH, 'لو عايز أقصر طريق — 10 مهام فقط، لا تنتقل للتي بعدها حتى تفهمها.');
+out += renderListPhase('final','🏆','🏆','#FFD54F','المشروع الختامي','Capstone', FINAL_PROJECTS, 'لا تعتبر نفسك خلصت بمجرد إنهاء الدروس — Recon → Enumeration → Exploitation → Detection → Report.');
+root.innerHTML = out;
+
+/* ---------------- sidebar ---------------- */
+const NAV_ENTRIES = [
+  ...PHASES.map(p=>({id:p.id, num:p.num, emoji:p.emoji, title:p.title, color:p.color})),
+  {id:'p16', num:'16', emoji:'🧠', title:'اختيار المسار', color:'#F4B942'},
+  {id:'p17', num:'17', emoji:'🧰', title:'قاعدة الأدوات', color:'#F2B441'},
+  {id:'p18', num:'18', emoji:'📖', title:'المصطلحات', color:'#7A8699'},
+  {id:'p19', num:'19', emoji:'🎓', title:'الشهادات', color:'#8C6A26'},
+  {id:'p20', num:'20', emoji:'💼', title:'المسارات الوظيفية', color:'#3D8BFD'},
+  {id:'quick', num:'⭐', emoji:'⭐', title:'المسار السريع', color:'#F4B942'},
+  {id:'final', num:'🏆', emoji:'🏆', title:'المشروع الختامي', color:'#FFD54F'},
+];
+
+/* grouped so the sidebar reads as 4 stages instead of one flat list of 21 items */
+const NAV_GROUPS = [
+  {label:'التأسيس', ids:['p0','p1','p2','p3','p4','p5','p6']},
+  {label:'الهجوم', ids:['p7','p8','p9','p10','p11','p12','p13']},
+  {label:'الدفاع والسحابة', ids:['p14','p15']},
+  {label:'التخصص والموارد', ids:['p16','p17','p18','p19','p20','quick','final']},
+];
+const navById = Object.fromEntries(NAV_ENTRIES.map(n=>[n.id,n]));
+
+const sidebar = document.getElementById('sidebar');
+sidebar.innerHTML = NAV_GROUPS.map(g=>
+  `<div class="navlabel">${g.label}</div>` +
+  g.ids.map(id=>{
+    const n = navById[id];
+    return `<div class="navitem" data-target="${n.id}" style="--phase-color:${n.color}">
+      <span class="dot"></span><span class="num">${n.num}</span><span>${n.title}</span>
+      <div class="bar"><i data-navbar="${n.id}"></i></div>
+    </div>`;
+  }).join('')
+).join('');
+
+sidebar.querySelectorAll('.navitem').forEach(el=>{
+  el.addEventListener('click', ()=>{ goToSection(el.dataset.target); });
+});
+
+/* mobile jump menu — the sidebar hides below 900px, so give small screens a way to navigate too */
+const mobileNav = document.getElementById('mobileNav');
+if(mobileNav){
+  mobileNav.innerHTML = `<option value="">— انتقل إلى قسم —</option>` + NAV_GROUPS.map(g=>
+    `<optgroup label="${g.label}">` + g.ids.map(id=>{
+      const n = navById[id];
+      return `<option value="${n.id}">${n.num !== undefined ? n.num + ' · ' : ''}${n.title}</option>`;
+    }).join('') + `</optgroup>`
+  ).join('');
+  mobileNav.addEventListener('change', ()=>{
+    const id = mobileNav.value;
+    if(id) goToSection(id);
+    mobileNav.value = '';
+  });
+}
+
+const sections = [...document.querySelectorAll('.phase')];
+const navItems = [...sidebar.querySelectorAll('.navitem')];
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ navItems.forEach(n=>n.classList.toggle('active', n.dataset.target===e.target.id)); } });
+}, {rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>io.observe(s));
+
+/* ---------------- interactive widgets ---------------- */
+document.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('subnet-input')){
+    const out = e.target.closest('.tool-simulator').querySelector('.subnet-out');
+    const m = e.target.value.trim().match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/);
+    if(!m){ out.textContent = e.target.value ? 'صيغة غير صحيحة. مثال: 192.168.1.0/26' : ''; return; }
+    const octets = m.slice(1,5).map(Number);
+    const prefix = Number(m[5]);
+    if(octets.some(o=>o>255) || prefix>32){ out.textContent = 'قيمة خارج النطاق.'; return; }
+    const hostBits = 32 - prefix;
+    const totalHosts = Math.pow(2, hostBits);
+    const usable = Math.max(totalHosts - 2, 0);
+    const ipInt = octets.reduce((a,o)=>a*256+o,0);
+    const mask = prefix===0?0:(0xFFFFFFFF << (32-prefix)) >>> 0;
+    const network = (ipInt & mask) >>> 0;
+    const broadcast = (network | (~mask >>> 0)) >>> 0;
+    const toIp = n => [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+    out.textContent = `Network: ${toIp(network)}  |  Broadcast: ${toIp(broadcast)}  |  Total IPs: ${totalHosts}  |  Usable Hosts: ${usable}`;
+  }
+  if(e.target.classList.contains('jwt-input')){
+    const out = e.target.closest('.tool-simulator').querySelector('.jwt-out');
+    const parts = e.target.value.trim().split('.');
+    if(parts.length < 2){ out.textContent = ''; return; }
+    try{
+      const pad = s => s + '==='.slice((s.length+3)%4);
+      const decode = s => JSON.stringify(JSON.parse(atob(pad(s.replace(/-/g,'+').replace(/_/g,'/')))), null, 2);
+      out.textContent = 'Header:\n' + decode(parts[0]) + '\n\nPayload:\n' + decode(parts[1]);
+    }catch(err){ out.textContent = 'تعذّر فك الترميز — تأكد أن التوكن بصيغة JWT صحيحة.'; }
+  }
+  if(e.target.classList.contains('entropy-input')){
+    const out = e.target.closest('.tool-simulator').querySelector('.entropy-out');
+    const v = e.target.value;
+    if(!v){ out.textContent = ''; return; }
+    let pool = 0;
+    if(/[a-z]/.test(v)) pool += 26;
+    if(/[A-Z]/.test(v)) pool += 26;
+    if(/[0-9]/.test(v)) pool += 10;
+    if(/[^a-zA-Z0-9]/.test(v)) pool += 32;
+    const bits = Math.round(v.length * Math.log2(pool || 1));
+    let verdict = 'ضعيفة جدًا';
+    if(bits >= 80) verdict = 'قوية';
+    else if(bits >= 60) verdict = 'مقبولة';
+    else if(bits >= 40) verdict = 'ضعيفة';
+    out.textContent = `الطول: ${v.length}  |  Entropy تقريبية: ${bits} bit  |  التقييم: ${verdict}`;
+  }
+});
+
+/* ---------------- progress + persistent storage ---------------- */
+const STORAGE_KEY = 'cyberlab-progress-v1';
+let state = { checked:{}, track:null };
+const saveStatusEl = document.getElementById('saveStatus');
+const resetBtn = document.getElementById('resetBtn');
+
+function allCheckboxes(){ return [...document.querySelectorAll('.track-item')]; }
+
+function updatePhaseProgress(phaseEl){
+  const boxes = phaseEl.querySelectorAll('.track-item');
+  const total = boxes.length;
+  const done = [...boxes].filter(b=>b.checked).length;
+  const wrap = phaseEl.querySelector('.phase-progress');
+  if(wrap){
+    wrap.querySelector('.cnt').textContent = `${done}/${total}`;
+    wrap.querySelector('.track i').style.width = total? `${(done/total*100)}%` : '0%';
+  }
+}
+
+function updateAll(){
+  const boxes = allCheckboxes();
+  const total = boxes.length;
+  const done = boxes.filter(b=>b.checked).length;
+  const pct = total? Math.round(done/total*100) : 0;
+
+  document.getElementById('heroCount').textContent = `${done} / ${total}`;
+  document.getElementById('heroBar').style.width = pct + '%';
+
+  document.querySelectorAll('.phase').forEach(updatePhaseProgress);
+  document.querySelectorAll('.phase').forEach(p=>{
+    const boxes2 = p.querySelectorAll('.track-item');
+    const t2 = boxes2.length, d2 = [...boxes2].filter(b=>b.checked).length;
+    const nb = document.querySelector(`[data-navbar="${p.id}"]`);
+    if(nb) nb.style.width = t2? `${(d2/t2*100)}%` : '0%';
+  });
+
+  const r = 19, C = 2*Math.PI*r;
+  const fill = document.getElementById('gaugeFill');
+  fill.setAttribute('stroke-dasharray', `${(pct/100)*C} ${C}`);
+  document.getElementById('gaugePct').textContent = pct + '%';
+
+  const ranks = [
+    {min:0,  label:'مجنَّد', sub:'بداية الرحلة'},
+    {min:1,  label:'مبتدئ', sub:'أول خطوات المختبر'},
+    {min:25, label:'محلل مبتدئ', sub:'الأساسيات تترسّخ'},
+    {min:50, label:'مختص أمن سيبراني', sub:'منتصف الطريق'},
+    {min:75, label:'عملياتي متقدّم', sub:'قريب من الاحتراف'},
+    {min:100,label:'خبير أمن سيبراني', sub:'التصريح الكامل ممنوح'},
+  ];
+  const rank = [...ranks].reverse().find(r=>pct>=r.min);
+  document.getElementById('rankLabel').textContent = rank.label;
+  document.getElementById('rankSub').textContent = `${rank.sub} · ${done}/${total}`;
+}
+
+function applyStateToDOM(){
+  document.querySelectorAll('.track-item').forEach(b=>{
+    const id = b.dataset.id;
+    const checked = !!state.checked[id];
+    b.checked = checked;
+    const wrap = document.querySelector(`.citem[data-id="${id}"], .task-item[data-id="${id}"]`);
+    if(wrap) wrap.classList.toggle('done', checked);
+  });
+  document.querySelectorAll('.track-card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.track === state.track);
+  });
+  updateAll();
+}
+
+let saveTimer = null;
+function persist(){
+  clearTimeout(saveTimer);
+  saveStatusEl.textContent = '…';
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      saveStatusEl.textContent = '✓ محفوظ';
+    } catch (e) {
+      console.error('Save failed:', e);
+      saveStatusEl.textContent = 'تعذّر الحفظ';
+    }
+    setTimeout(()=>{ saveStatusEl.textContent=''; }, 1500);
+  }, 300);
+}
+
+document.addEventListener('change', (e)=>{
+  if(e.target.classList.contains('track-item')){
+    const id = e.target.dataset.id;
+    if(e.target.checked) state.checked[id] = true; else delete state.checked[id];
+    const wrap = document.querySelector(`.citem[data-id="${id}"], .task-item[data-id="${id}"]`);
+    if(wrap) wrap.classList.toggle('done', e.target.checked);
+    updateAll();
+    persist();
+  }
+});
+
+document.getElementById('tracksGrid').addEventListener('click', (e)=>{
+  const card = e.target.closest('.track-card');
+  if(!card) return;
+  state.track = (state.track === card.dataset.track) ? null : card.dataset.track;
+  document.querySelectorAll('.track-card').forEach(c=>c.classList.toggle('selected', c.dataset.track === state.track));
+  persist();
+});
+
+resetBtn.addEventListener('click', ()=>{
+  if(!confirm('هل تريد بالتأكيد إعادة تعيين كل التقدم؟ لا يمكن التراجع عن هذا.')) return;
+  resetBtn.disabled = true;
+  state = { checked:{}, track:null };
+  applyStateToDOM();
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.error(e);
+  } finally {
+    resetBtn.disabled = false;
+  }
+});
+
+function init(){
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved){
+      const parsed = JSON.parse(saved);
+      state = { checked: parsed.checked || {}, track: parsed.track || null };
+    }
+  } catch(e) {
+    console.log('No saved progress yet, starting fresh.');
+  }
+  applyStateToDOM();
+}
+
+init();
+routeHash();
+</script>
+</body>
+</html>
